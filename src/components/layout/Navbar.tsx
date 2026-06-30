@@ -1,8 +1,7 @@
 "use client";
 
-import { Menu, Bell, Search, Sun, Moon } from 'lucide-react';
+import { Menu, Bell, Sun, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -34,7 +33,7 @@ export const Navbar = ({ toggleSidebar }: NavbarProps) => {
   }, []);
 
   return (
-    <header className="h-20 bg-background/80 backdrop-blur-md border-b border-border flex items-center justify-between px-4 sm:px-6 sticky top-0 z-10 transition-all">
+    <header className="h-20 bg-background/80 backdrop-blur-md border-b border-border flex items-center justify-between px-4 sm:px-6 sticky top-0 z-10">
       <div className="flex items-center flex-1">
         <Button 
           variant="ghost" 
@@ -45,13 +44,6 @@ export const Navbar = ({ toggleSidebar }: NavbarProps) => {
           <Menu className="h-5 w-5 text-muted-foreground" />
         </Button>
         
-        <div className="hidden sm:flex max-w-md w-full relative group">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-          <Input 
-            placeholder="Cari sesuatu..." 
-            className="pl-10 bg-muted/50 border-border focus-visible:ring-primary rounded-full"
-          />
-        </div>
       </div>
 
       <div className="flex items-center space-x-3 sm:space-x-4">
