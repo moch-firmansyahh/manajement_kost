@@ -38,8 +38,7 @@ export default function Dashboard() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-foreground tracking-tight">Overview Dashboard</h1>
-        <p className="text-muted-foreground mt-1">Selamat datang kembali! Berikut adalah ringkasan properti Anda hari ini.</p>
+        <h1 className="text-2xl font-bold text-foreground tracking-tight">Dashboard</h1>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

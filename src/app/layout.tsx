@@ -18,16 +18,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id" suppressHydrationWarning>
-      <body className={`${inter.className} bg-background min-h-screen text-foreground`}>
+      <body
+        className={`${inter.className} bg-background min-h-screen text-foreground`}
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          <MainLayoutClient>
-            {children}
-          </MainLayoutClient>
+          <MainLayoutClient>{children}</MainLayoutClient>
         </ThemeProvider>
       </body>
     </html>

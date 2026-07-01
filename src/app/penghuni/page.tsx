@@ -43,8 +43,7 @@ export default function PenghuniPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">Data Penghuni</h1>
-          <p className="text-muted-foreground mt-1">Kelola data penghuni kost Anda di sini.</p>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Penghuni</h1>
         </div>
         <Button 
           onClick={() => setIsFormOpen(true)}

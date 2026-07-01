@@ -26,7 +26,7 @@ export const Navbar = ({ toggleSidebar }: NavbarProps) => {
   const { dataPembayaran } = usePembayaran();
   const { dataPenghuni } = usePenghuni();
 
-  const unpaidPembayaran = dataPembayaran.filter(p => p.status === 'belum_bayar' || p.status === 'terlambat');
+  const latePembayaran = dataPembayaran.filter(p => p.status === 'terlambat');
 
   useEffect(() => {
     setMounted(true);
@@ -62,9 +62,9 @@ export const Navbar = ({ toggleSidebar }: NavbarProps) => {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground outline-none ring-0 focus-visible:ring-0">
               <Bell className="h-5 w-5" />
-              {unpaidPembayaran.length > 0 && (
+              {latePembayaran.length > 0 && (
                 <span className="absolute top-1 right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-destructive text-[8px] font-bold text-white border-2 border-background shadow-sm">
-                  {unpaidPembayaran.length}
+                  {latePembayaran.length}
                 </span>
               )}
             </Button>
@@ -72,13 +72,13 @@ export const Navbar = ({ toggleSidebar }: NavbarProps) => {
           <DropdownMenuContent align="end" className="w-80">
             <DropdownMenuLabel>Notifikasi Tagihan</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {unpaidPembayaran.length === 0 ? (
+            {latePembayaran.length === 0 ? (
               <div className="p-4 text-center text-sm text-muted-foreground">
                 Tidak ada tagihan tertunggak 🎉
               </div>
             ) : (
               <div className="max-h-80 overflow-y-auto">
-                {unpaidPembayaran.map(p => {
+                {latePembayaran.map(p => {
                   const penghuni = dataPenghuni.find(pen => pen.id === p.penghuniId);
                   return (
                     <DropdownMenuItem key={p.id} className="flex flex-col items-start gap-1 p-3 cursor-default focus:bg-muted/50">
@@ -96,7 +96,7 @@ export const Navbar = ({ toggleSidebar }: NavbarProps) => {
                 })}
               </div>
             )}
-            {unpaidPembayaran.length > 0 && (
+            {latePembayaran.length > 0 && (
               <>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="w-full p-0" asChild>

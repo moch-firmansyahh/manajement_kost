@@ -35,7 +35,7 @@ const DUMMY_KAMAR: Kamar[] = [
 ];
 
 // Global state to persist data across page navigation during development
-let globalDataKamar = [...DUMMY_KAMAR];
+export let globalDataKamar = [...DUMMY_KAMAR];
 let listeners: React.Dispatch<React.SetStateAction<Kamar[]>>[] = [];
 
 const notifyListeners = (data: Kamar[]) => {

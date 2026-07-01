@@ -23,12 +23,14 @@ export const PembayaranTable = ({ data, dataPenghuni, dataKamar, onEdit, onDelet
 
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden shadow-sm">
-      <Table className="min-w-[700px]">
+      <Table className="min-w-[950px]">
         <TableHeader className="bg-muted/50">
           <TableRow>
             <TableHead>Penghuni</TableHead>
             <TableHead>Kamar</TableHead>
             <TableHead>Bulan/Tahun</TableHead>
+            <TableHead>Jatuh Tempo</TableHead>
+            <TableHead>Tgl Dibayar</TableHead>
             <TableHead>Jumlah</TableHead>
             <TableHead>Status</TableHead>
             <TableHead className="text-right">Aksi</TableHead>
@@ -38,12 +40,39 @@ export const PembayaranTable = ({ data, dataPenghuni, dataKamar, onEdit, onDelet
           {data.map((bayar) => {
             const penghuni = dataPenghuni.find(p => p.id === bayar.penghuniId);
             const kamar = dataKamar.find(k => k.id === bayar.kamarId);
+            const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            
+            // Hitung Jatuh Tempo
+            let dueText = "-";
+            if (penghuni) {
+              const masukDate = new Date(penghuni.tanggalMasuk);
+              const dueDay = masukDate.getDate();
+              const monthIndex = namaBulan.indexOf(bayar.bulan);
+              if (monthIndex !== -1) {
+                dueText = `${dueDay} ${bayar.bulan} ${bayar.tahun}`;
+              }
+            }
+
+            // Teks Tanggal Dibayar
+            let payText = "-";
+            if (bayar.status === "lunas" && bayar.tanggalBayar) {
+              const payDate = new Date(bayar.tanggalBayar);
+              payText = `${payDate.getDate()} ${namaBulan[payDate.getMonth()]} ${payDate.getFullYear()}`;
+            }
             
             return (
               <TableRow key={bayar.id} className="hover:bg-muted/50 transition-colors">
                 <TableCell className="font-semibold text-foreground">{penghuni ? penghuni.nama : "-"}</TableCell>
                 <TableCell className="text-foreground">{kamar ? kamar.nomorKamar : "-"}</TableCell>
                 <TableCell className="text-foreground">{bayar.bulan} {bayar.tahun}</TableCell>
+                <TableCell className="text-muted-foreground">{dueText}</TableCell>
+                <TableCell className="text-foreground">
+                  {bayar.status === "lunas" ? (
+                    <span className="text-emerald-600 dark:text-emerald-400 font-medium">{payText}</span>
+                  ) : (
+                    <span className="text-muted-foreground">-</span>
+                  )}
+                </TableCell>
                 <TableCell className="text-foreground">{formatRupiah(bayar.jumlah)}</TableCell>
                 <TableCell>
                   <StatusBadge status={bayar.status} />

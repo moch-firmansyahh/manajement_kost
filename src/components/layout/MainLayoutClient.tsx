@@ -1,14 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Navbar } from "@/components/layout/Navbar";
 import { cn } from "@/lib/utils";
+import { autoGenerateTagihan } from "@/hooks/usePembayaran";
 
 export const MainLayoutClient = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  useEffect(() => {
+    // Jalankan sistem auto-billing (Generate tagihan otomatis) HANYA SEKALI SAAT APP DIMUAT
+    autoGenerateTagihan();
+  }, []);
 
   // Jika di halaman login, jangan tampilkan sidebar & navbar
   const isLoginPage = pathname === "/login";
@@ -31,7 +37,7 @@ export const MainLayoutClient = ({ children }: { children: React.ReactNode }) =>
       
       <div 
         className={cn(
-          "flex-1 flex flex-col min-w-0 min-h-screen transition-all duration-300 ease-in-out",
+          "flex-1 flex flex-col min-w-0 min-h-screen", // Dihapus: transition-all yang membebani render
           isSidebarOpen ? "md:ml-64" : "md:ml-0"
         )}
       >

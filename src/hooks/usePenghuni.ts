@@ -9,13 +9,13 @@ const DUMMY_PENGHUNI: Penghuni[] = [
     noTelepon: "081234567890",
     email: "budi@example.com",
     kamarId: "1",
-    tanggalMasuk: "2024-01-15T00:00:00.000Z",
+    tanggalMasuk: "2026-03-01T00:00:00.000Z",
     tanggalKeluar: null,
-    createdAt: "2024-01-15T00:00:00.000Z",
+    createdAt: "2026-03-01T00:00:00.000Z",
   }
 ];
 
-let globalDataPenghuni = [...DUMMY_PENGHUNI];
+export let globalDataPenghuni = [...DUMMY_PENGHUNI];
 let listeners: React.Dispatch<React.SetStateAction<Penghuni[]>>[] = [];
 
 const notifyListeners = (data: Penghuni[]) => {
