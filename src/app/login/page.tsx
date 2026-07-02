@@ -26,7 +26,7 @@ export default function LoginPage() {
 
     setIsLoading(true);
     setTimeout(() => {
-      // Dummy login
+      sessionStorage.setItem("isAuth", "true");
       router.push("/");
     }, 800);
   };

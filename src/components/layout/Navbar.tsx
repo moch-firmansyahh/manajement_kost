@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu, Bell, Sun, Moon } from 'lucide-react';
+import { Menu, Bell, Sun, Moon, AlertCircle, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
@@ -76,6 +76,7 @@ export const Navbar = ({ toggleSidebar }: NavbarProps) => {
           <DropdownMenuContent align="end" className="w-80">
             <DropdownMenuLabel>Notifikasi Tagihan</DropdownMenuLabel>
             <DropdownMenuSeparator />
+            
             {latePembayaran.length === 0 ? (
               <div className="p-4 text-center text-sm text-muted-foreground">
                 Tidak ada tagihan tertunggak 🎉
@@ -85,26 +86,30 @@ export const Navbar = ({ toggleSidebar }: NavbarProps) => {
                 {latePembayaran.map(p => {
                   const penghuni = dataPenghuni.find(pen => pen.id === p.penghuniId);
                   return (
-                    <DropdownMenuItem key={p.id} className="flex flex-col items-start gap-1 p-3 cursor-default focus:bg-muted/50">
+                    <DropdownMenuItem 
+                      key={p.id} 
+                      className="flex flex-col items-start gap-1 p-3 cursor-default"
+                    >
                       <div className="flex justify-between w-full items-center">
                         <span className="font-medium text-foreground">{penghuni?.nama || 'Unknown'}</span>
                         <span className="text-[10px] uppercase font-bold text-destructive bg-destructive/10 px-2 py-0.5 rounded-full">
-                          {p.status.replace("_", " ")}
+                          {p.status}
                         </span>
                       </div>
                       <span className="text-xs text-muted-foreground">
-                        Tagihan Bulan {p.bulan} {p.tahun} - Rp {p.jumlah.toLocaleString('id-ID')}
+                        Tagihan {p.bulan} {p.tahun} - <span className="font-medium text-destructive">Rp {p.jumlah.toLocaleString('id-ID')}</span>
                       </span>
                     </DropdownMenuItem>
                   )
                 })}
               </div>
             )}
+            
             {latePembayaran.length > 0 && (
               <>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="w-full p-0" asChild>
-                  <Link href="/pembayaran" className="w-full text-center text-primary font-medium py-2 block cursor-pointer hover:bg-primary/5">
+                <DropdownMenuItem className="w-full justify-center text-xs cursor-pointer text-muted-foreground" asChild>
+                  <Link href="/pembayaran">
                     Lihat Semua Tagihan
                   </Link>
                 </DropdownMenuItem>

@@ -12,6 +12,7 @@ export default function ProfilePage() {
   const router = useRouter();
 
   const handleLogout = () => {
+    sessionStorage.removeItem("isAuth");
     router.push("/login");
   };
 
