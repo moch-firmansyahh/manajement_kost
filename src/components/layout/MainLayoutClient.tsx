@@ -37,7 +37,7 @@ export const MainLayoutClient = ({ children }: { children: React.ReactNode }) =>
       
       <div 
         className={cn(
-          "flex-1 flex flex-col min-w-0 min-h-screen", // Dihapus: transition-all yang membebani render
+          "flex-1 flex flex-col min-w-0 min-h-screen transition-[margin] duration-300 ease-in-out",
           isSidebarOpen ? "md:ml-64" : "md:ml-0"
         )}
       >

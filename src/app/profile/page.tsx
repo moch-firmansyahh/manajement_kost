@@ -28,12 +28,7 @@ export default function ProfilePage() {
             <div className="h-24 w-24 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg shadow-blue-500/20 mb-4">
               A
             </div>
-            <h3 className="text-xl font-semibold text-foreground">Admin KostMan</h3>
-            <p className="text-sm text-muted-foreground mb-4">Administrator Utama</p>
-            <div className="flex items-center text-sm text-muted-foreground bg-muted px-3 py-1.5 rounded-full mb-6">
-              <Shield className="h-4 w-4 mr-2 text-emerald-500" />
-              Super Admin
-            </div>
+            <h3 className="text-xl font-semibold text-foreground mb-6">Admin KostMan</h3>
             
             <Button 
               variant="destructive" 

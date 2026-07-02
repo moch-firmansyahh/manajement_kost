@@ -71,6 +71,7 @@ export const PembayaranForm = ({
   dataKamar,
 }: PembayaranFormProps) => {
   const [formData, setFormData] = useState(DEFAULT_STATE);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (initialData) {
@@ -88,6 +89,7 @@ export const PembayaranForm = ({
     } else {
       setFormData(DEFAULT_STATE);
     }
+    setError(null);
   }, [initialData, isOpen]);
 
   const handlePenghuniChange = (penghuniId: string) => {
@@ -105,13 +107,16 @@ export const PembayaranForm = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
 
     if (!formData.penghuniId) {
-      return alert("Silakan pilih penghuni terlebih dahulu");
+      setError("Silakan pilih penghuni terlebih dahulu");
+      return;
     }
 
     if (formData.status === "lunas" && !formData.tanggalBayar) {
-      return alert("Silakan isi Tanggal Bayar jika statusnya Lunas");
+      setError("Silakan isi Tanggal Bayar jika statusnya Lunas");
+      return;
     }
 
     onSubmit({
@@ -273,6 +278,12 @@ export const PembayaranForm = ({
                   />
                 </PopoverContent>
               </Popover>
+            </div>
+          )}
+
+          {error && (
+            <div className="text-sm font-medium text-red-500 text-right mt-2">
+              *{error}
             </div>
           )}
 
