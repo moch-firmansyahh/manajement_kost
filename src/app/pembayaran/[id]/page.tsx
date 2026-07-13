@@ -53,7 +53,7 @@ export default function PembayaranDetailPage({ params }: { params: Promise<{ id:
             <StatusBadge status={pembayaran.status} className="text-sm px-3 py-1" />
           </div>
           <CardHeader>
-            <div className="flex items-center text-blue-600 dark:text-blue-400 mb-2">
+            <div className="flex items-center text-primary mb-2">
               <ReceiptText className="h-5 w-5 mr-2" />
               <CardTitle className="text-lg text-foreground">Ringkasan Tagihan</CardTitle>
             </div>
@@ -84,7 +84,7 @@ export default function PembayaranDetailPage({ params }: { params: Promise<{ id:
           <Card className="border-border shadow-sm">
             <CardHeader>
               <div className="flex items-center text-foreground">
-                <User className="h-5 w-5 mr-2 text-blue-500" />
+                <User className="h-5 w-5 mr-2 text-primary" />
                 <CardTitle className="text-lg">Informasi Penghuni</CardTitle>
               </div>
             </CardHeader>

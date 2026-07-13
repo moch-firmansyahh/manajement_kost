@@ -62,10 +62,10 @@ export default function PenghuniDetailPage({ params }: { params: Promise<{ id: s
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="border-border shadow-sm lg:col-span-1 bg-gradient-to-b from-blue-50/50 to-background dark:from-blue-950/20">
+        <Card className="border-border shadow-sm lg:col-span-1 bg-gradient-to-b from-primary/5 to-background dark:from-primary/10">
           <CardHeader>
             <div className="flex flex-col items-center">
-              <div className="h-24 w-24 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-4 shadow-sm">
+              <div className="h-24 w-24 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary dark:text-primary-foreground mb-4 shadow-sm">
                 <User className="h-10 w-10" />
               </div>
               <CardTitle className="text-xl">{penghuni.nama}</CardTitle>

@@ -195,7 +195,7 @@ export default function GantiSandiPage() {
               <div className="pt-4 border-t border-border">
                 <Button 
                   type="submit" 
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
                   disabled={isLoading || !isValidPassword || !isMatch || !currentPassword}
                 >
                   {isLoading ? "Memproses Hashing..." : "Simpan & Enkripsi Sandi"}

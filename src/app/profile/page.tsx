@@ -26,7 +26,7 @@ export default function ProfilePage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="border-border shadow-sm md:col-span-1 h-fit">
           <CardContent className="pt-6 flex flex-col items-center text-center">
-            <div className="h-24 w-24 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg shadow-blue-500/20 mb-4">
+            <div className="h-24 w-24 rounded-full bg-gradient-to-tr from-primary to-primary/80 flex items-center justify-center text-white text-3xl font-bold shadow-lg shadow-primary/20 mb-4">
               A
             </div>
             <h3 className="text-xl font-semibold text-foreground mb-6">Admin KostMan</h3>
@@ -71,7 +71,7 @@ export default function ProfilePage() {
               </p>
               <Button 
                 asChild
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 <Link href="/profile/ganti-sandi">
                   <Key className="mr-2 h-4 w-4" />
