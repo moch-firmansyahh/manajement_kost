@@ -291,7 +291,7 @@ export const PembayaranForm = ({
             <Button type="button" variant="outline" onClick={onClose}>
               Batal
             </Button>
-            <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+            <Button type="submit" className="bg-primary text-primary-foreground hover:bg-primary/90">
               Simpan
             </Button>
           </div>

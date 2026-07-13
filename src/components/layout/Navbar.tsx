@@ -119,7 +119,7 @@ export const Navbar = ({ toggleSidebar }: NavbarProps) => {
         </DropdownMenu>
         
         <Link href="/profile">
-          <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-medium text-sm shadow-sm ring-2 ring-background cursor-pointer hover:shadow-md transition-all hover:scale-105">
+          <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-primary to-primary/80 flex items-center justify-center text-white font-medium text-sm shadow-sm ring-2 ring-background cursor-pointer hover:shadow-md transition-all hover:scale-105">
             A
           </div>
         </Link>
