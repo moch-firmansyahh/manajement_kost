@@ -1,17 +1,42 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Pembayaran } from '@/types';
 
+// Cache global di level modul
+let cachePembayaran: Pembayaran[] = [];
+let isPembayaranLoaded = false;
+let pembayaranActiveFetch: Promise<Pembayaran[]> | null = null;
+const listeners = new Set<(data: Pembayaran[]) => void>();
+
 // Custom hook untuk operasi CRUD Pembayaran Sewa Kost
 export const usePembayaran = () => {
-  const [dataPembayaran, setDataPembayaran] = useState<Pembayaran[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [dataPembayaran, setDataPembayaran] = useState<Pembayaran[]>(cachePembayaran);
+  const [isLoading, setIsLoading] = useState(!isPembayaranLoaded);
   const [error, setError] = useState<string | null>(null);
 
   // Mengambil data seluruh tagihan pembayaran dari API
-  const ambilPembayaran = useCallback(async () => {
+  const ambilPembayaran = useCallback(async (force = false) => {
+    if (isPembayaranLoaded && !force) {
+      setDataPembayaran(cachePembayaran);
+      setIsLoading(false);
+      return;
+    }
+
+    if (pembayaranActiveFetch) {
+      try {
+        const data = await pembayaranActiveFetch;
+        setDataPembayaran(data);
+      } catch (err: any) {
+        setError(err.message || 'Terjadi kesalahan');
+      } finally {
+        setIsLoading(false);
+      }
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
-    try {
+
+    pembayaranActiveFetch = (async () => {
       // 1. Jalankan sinkronisasi / pembuatan tagihan otomatis di server
       await fetch('/api/pembayaran/generate', { method: 'POST' });
       
@@ -21,16 +46,32 @@ export const usePembayaran = () => {
         throw new Error('Gagal mengambil data pembayaran');
       }
       const data = await response.json();
+      cachePembayaran = data;
+      isPembayaranLoaded = true;
+      return data;
+    })();
+
+    try {
+      const data = await pembayaranActiveFetch;
       setDataPembayaran(data);
+      listeners.forEach(listener => listener(data));
     } catch (err: any) {
       setError(err.message || 'Terjadi kesalahan');
     } finally {
+      pembayaranActiveFetch = null;
       setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
+    const handleUpdate = (newData: Pembayaran[]) => {
+      setDataPembayaran(newData);
+    };
+    listeners.add(handleUpdate);
     ambilPembayaran();
+    return () => {
+      listeners.delete(handleUpdate);
+    };
   }, [ambilPembayaran]);
 
   // Mencari data pembayaran berdasarkan ID
@@ -47,7 +88,8 @@ export const usePembayaran = () => {
       if (!response.ok) {
         throw new Error('Gagal menambah data pembayaran');
       }
-      await ambilPembayaran();
+      isPembayaranLoaded = false;
+      await ambilPembayaran(true);
     } catch (err) {
       console.error(err);
     }
@@ -64,7 +106,8 @@ export const usePembayaran = () => {
       if (!response.ok) {
         throw new Error('Gagal memperbarui data pembayaran');
       }
-      await ambilPembayaran();
+      isPembayaranLoaded = false;
+      await ambilPembayaran(true);
     } catch (err) {
       console.error(err);
     }
@@ -79,7 +122,8 @@ export const usePembayaran = () => {
       if (!response.ok) {
         throw new Error('Gagal menghapus data pembayaran');
       }
-      await ambilPembayaran();
+      isPembayaranLoaded = false;
+      await ambilPembayaran(true);
     } catch (err) {
       console.error(err);
     }
@@ -90,7 +134,8 @@ export const usePembayaran = () => {
     try {
       const related = dataPembayaran.filter(p => p.penghuniId === penghuniId);
       await Promise.all(related.map(p => fetch(`/api/pembayaran/${p.id}`, { method: 'DELETE' })));
-      await ambilPembayaran();
+      isPembayaranLoaded = false;
+      await ambilPembayaran(true);
     } catch (err) {
       console.error(err);
     }
@@ -105,6 +150,6 @@ export const usePembayaran = () => {
     perbaruiPembayaran,
     hapusPembayaran,
     hapusPembayaranSesuaiIdPenghuni,
-    refresh: ambilPembayaran,
+    refresh: () => ambilPembayaran(true),
   };
 };
