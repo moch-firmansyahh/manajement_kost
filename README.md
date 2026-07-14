@@ -64,7 +64,7 @@ manajemen-kost/
 
 ---
 
-## ⚡ Cara Menjalankan Proyek
+## ⚡ Cara Menjalankan
 
 ### Prasyarat (Prerequisites)
 - Node.js versi 18 ke atas
