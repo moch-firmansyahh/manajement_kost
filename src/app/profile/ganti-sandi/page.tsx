@@ -58,12 +58,7 @@ export default function GantiSandiPage() {
     // Simulate network request and hashing
     setTimeout(() => {
       setIsLoading(false);
-      setIsSuccess(true);
-      
-      // Redirect back after 2 seconds
-      setTimeout(() => {
-        router.push("/profile");
-      }, 2000);
+      router.push("/profile");
     }, 1500);
   };
 

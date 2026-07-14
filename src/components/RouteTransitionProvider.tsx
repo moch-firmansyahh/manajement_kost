@@ -48,8 +48,10 @@ export function RouteTransitionProvider({ children }: { children: React.ReactNod
   // Mematikan loading screen HANYA JIKA halaman benar-benar sudah selesai berpindah
   React.useEffect(() => {
     if (!isInitialMount) {
+      const isDashboardOrLogin = pathname === "/" || pathname === "/login";
       const elapsed = Date.now() - transitionStartRef.current;
-      const remaining = Math.max(0, 1200 - elapsed);
+      const minDur = isDashboardOrLogin ? 1200 : 0;
+      const remaining = Math.max(0, minDur - elapsed);
 
       const timeout = setTimeout(() => {
         // Mulai fade out
@@ -74,8 +76,10 @@ export function RouteTransitionProvider({ children }: { children: React.ReactNod
 
   // Menghentikan loading screen (biasanya digunakan untuk refresh halaman yang sama)
   const stopTransition = useCallback(() => {
+    const isDashboardOrLogin = pathname === "/" || pathname === "/login";
     const elapsed = Date.now() - transitionStartRef.current;
-    const remaining = Math.max(0, 1200 - elapsed);
+    const minDur = isDashboardOrLogin ? 1200 : 0;
+    const remaining = Math.max(0, minDur - elapsed);
 
     setTimeout(() => {
       setIsVisible(false);
@@ -84,7 +88,7 @@ export function RouteTransitionProvider({ children }: { children: React.ReactNod
         setIsTransitioning(false);
       }, 300);
     }, remaining);
-  }, []);
+  }, [pathname]);
 
   return (
     <TransitionContext.Provider value={{ startTransition, stopTransition }}>
