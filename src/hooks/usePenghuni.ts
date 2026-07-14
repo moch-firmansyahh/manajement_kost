@@ -1,63 +1,88 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Penghuni } from '@/types';
 
-const DUMMY_PENGHUNI: Penghuni[] = [
-  {
-    id: "1",
-    nama: "Budi Santoso",
-    nik: "3201010101010001",
-    noTelepon: "081234567890",
-    email: "budi@example.com",
-    kamarId: "1",
-    tanggalMasuk: "2026-03-01T00:00:00.000Z",
-    tanggalKeluar: null,
-    createdAt: "2026-03-01T00:00:00.000Z",
-  }
-];
-
-export let globalDataPenghuni = [...DUMMY_PENGHUNI];
-let listeners: React.Dispatch<React.SetStateAction<Penghuni[]>>[] = [];
-
-const notifyListeners = (data: Penghuni[]) => {
-  globalDataPenghuni = data;
-  listeners.forEach(listener => listener(data));
-};
-
 export const usePenghuni = () => {
-  const [dataPenghuni, setDataPenghuni] = useState<Penghuni[]>(globalDataPenghuni);
+  const [dataPenghuni, setDataPenghuni] = useState<Penghuni[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    setDataPenghuni([...globalDataPenghuni]);
-    listeners.push(setDataPenghuni);
-    return () => {
-      listeners = listeners.filter(l => l !== setDataPenghuni);
-    };
+  const fetchPenghuni = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await fetch('/api/penghuni');
+      if (!response.ok) {
+        throw new Error('Gagal mengambil data penghuni');
+      }
+      const data = await response.json();
+      setDataPenghuni(data);
+    } catch (err: any) {
+      setError(err.message || 'Terjadi kesalahan');
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  const getPenghuniById = (id: string) => globalDataPenghuni.find(p => p.id === id);
+  useEffect(() => {
+    fetchPenghuni();
+  }, [fetchPenghuni]);
 
-  const addPenghuni = (penghuni: Omit<Penghuni, 'id' | 'createdAt'>) => {
-    const newPenghuni: Penghuni = {
-      ...penghuni,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
-    };
-    notifyListeners([...globalDataPenghuni, newPenghuni]);
+  const getPenghuniById = (id: string) => dataPenghuni.find(p => p.id === id);
+
+  const addPenghuni = async (penghuni: Omit<Penghuni, 'id' | 'createdAt'>) => {
+    try {
+      const response = await fetch('/api/penghuni', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(penghuni),
+      });
+      if (!response.ok) {
+        throw new Error('Gagal menambah penghuni');
+      }
+      await fetchPenghuni();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const updatePenghuni = (id: string, updatedData: Partial<Penghuni>) => {
-    notifyListeners(globalDataPenghuni.map(p => p.id === id ? { ...p, ...updatedData } : p));
+  const updatePenghuni = async (id: string, updatedData: Partial<Penghuni>) => {
+    try {
+      const response = await fetch(`/api/penghuni/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedData),
+      });
+      if (!response.ok) {
+        throw new Error('Gagal memperbarui penghuni');
+      }
+      await fetchPenghuni();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const deletePenghuni = (id: string) => {
-    notifyListeners(globalDataPenghuni.filter(p => p.id !== id));
+  const deletePenghuni = async (id: string) => {
+    try {
+      const response = await fetch(`/api/penghuni/${id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Gagal menghapus penghuni');
+      }
+      await fetchPenghuni();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return {
     dataPenghuni,
+    isLoading,
+    error,
     getPenghuniById,
     addPenghuni,
     updatePenghuni,
     deletePenghuni,
+    refresh: fetchPenghuni,
   };
 };

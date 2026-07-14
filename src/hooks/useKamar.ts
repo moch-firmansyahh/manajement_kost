@@ -1,83 +1,88 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Kamar } from '@/types';
 
-const DUMMY_KAMAR: Kamar[] = [
-  {
-    id: "1",
-    nomorKamar: "101",
-    lantai: 1,
-    tipe: "Standard",
-    hargaPerBulan: 800000,
-    fasilitas: ["Kasur", "Lemari", "Kipas Angin", "Kamar Mandi Luar"],
-    status: "terisi",
-    createdAt: "2024-01-01T00:00:00.000Z",
-  },
-  {
-    id: "2",
-    nomorKamar: "102",
-    lantai: 1,
-    tipe: "Deluxe",
-    hargaPerBulan: 1200000,
-    fasilitas: ["Kasur", "Lemari", "AC", "WiFi", "Kamar Mandi Dalam"],
-    status: "tersedia",
-    createdAt: "2024-01-01T00:00:00.000Z",
-  },
-  {
-    id: "3",
-    nomorKamar: "201",
-    lantai: 2,
-    tipe: "VIP",
-    hargaPerBulan: 1500000,
-    fasilitas: ["Kasur Springbed", "Lemari", "AC", "WiFi", "TV", "Kamar Mandi Dalam", "Water Heater"],
-    status: "maintenance",
-    createdAt: "2024-01-01T00:00:00.000Z",
-  }
-];
-
-// Global state to persist data across page navigation during development
-export let globalDataKamar = [...DUMMY_KAMAR];
-let listeners: React.Dispatch<React.SetStateAction<Kamar[]>>[] = [];
-
-const notifyListeners = (data: Kamar[]) => {
-  globalDataKamar = data;
-  listeners.forEach(listener => listener(data));
-};
-
 export const useKamar = () => {
-  const [dataKamar, setDataKamar] = useState<Kamar[]>(globalDataKamar);
+  const [dataKamar, setDataKamar] = useState<Kamar[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    setDataKamar([...globalDataKamar]);
-    listeners.push(setDataKamar);
-    return () => {
-      listeners = listeners.filter(l => l !== setDataKamar);
-    };
+  const fetchKamar = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await fetch('/api/kamar');
+      if (!response.ok) {
+        throw new Error('Gagal mengambil data kamar');
+      }
+      const data = await response.json();
+      setDataKamar(data);
+    } catch (err: any) {
+      setError(err.message || 'Terjadi kesalahan');
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  const getKamarById = (id: string) => globalDataKamar.find(k => k.id === id);
+  useEffect(() => {
+    fetchKamar();
+  }, [fetchKamar]);
 
-  const addKamar = (kamar: Omit<Kamar, 'id' | 'createdAt'>) => {
-    const newKamar: Kamar = {
-      ...kamar,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
-    };
-    notifyListeners([...globalDataKamar, newKamar]);
+  const getKamarById = (id: string) => dataKamar.find(k => k.id === id);
+
+  const addKamar = async (kamar: Omit<Kamar, 'id' | 'createdAt'>) => {
+    try {
+      const response = await fetch('/api/kamar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(kamar),
+      });
+      if (!response.ok) {
+        throw new Error('Gagal menambah kamar');
+      }
+      await fetchKamar();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const updateKamar = (id: string, updatedData: Partial<Kamar>) => {
-    notifyListeners(globalDataKamar.map(k => k.id === id ? { ...k, ...updatedData } : k));
+  const updateKamar = async (id: string, updatedData: Partial<Kamar>) => {
+    try {
+      const response = await fetch(`/api/kamar/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedData),
+      });
+      if (!response.ok) {
+        throw new Error('Gagal memperbarui kamar');
+      }
+      await fetchKamar();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const deleteKamar = (id: string) => {
-    notifyListeners(globalDataKamar.filter(k => k.id !== id));
+  const deleteKamar = async (id: string) => {
+    try {
+      const response = await fetch(`/api/kamar/${id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Gagal menghapus kamar');
+      }
+      await fetchKamar();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return {
     dataKamar,
+    isLoading,
+    error,
     getKamarById,
     addKamar,
     updateKamar,
     deleteKamar,
+    refresh: fetchKamar,
   };
 };

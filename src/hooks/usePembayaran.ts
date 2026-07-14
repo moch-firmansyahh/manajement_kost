@@ -1,127 +1,105 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Pembayaran } from '@/types';
-import { globalDataPenghuni } from './usePenghuni';
-import { globalDataKamar } from './useKamar';
-
-const DUMMY_PEMBAYARAN: Pembayaran[] = [];
-
-let globalDataPembayaran = [...DUMMY_PEMBAYARAN];
-let listeners: React.Dispatch<React.SetStateAction<Pembayaran[]>>[] = [];
-
-const notifyListeners = (data: Pembayaran[]) => {
-  globalDataPembayaran = data;
-  listeners.forEach(listener => listener(data));
-};
-
-export const autoGenerateTagihan = () => {
-  const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-  const now = new Date();
-  
-  let isModified = false;
-  
-  globalDataPenghuni.forEach(penghuni => {
-    if (penghuni.tanggalKeluar) return; // Skip inactive tenants
-    
-    const kamar = globalDataKamar.find(k => k.id === penghuni.kamarId);
-    if (!kamar) return;
-    
-    const masukDate = new Date(penghuni.tanggalMasuk);
-    const dueDay = masukDate.getDate(); // Jatuh tempo = tanggal masuk
-    
-    // Mulai tagihan otomatis 1 bulan setelah tanggal masuk
-    let currDate = new Date(masukDate.getFullYear(), masukDate.getMonth() + 1, 1);
-    
-    // Target = bulan depan (supaya tagihan bulan depan sudah muncul)
-    const targetDate = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-    
-    while (currDate <= targetDate) {
-      const bulanIndex = currDate.getMonth();
-      const bulan = namaBulan[bulanIndex];
-      const tahun = currDate.getFullYear();
-      
-      let bill = globalDataPembayaran.find(p => p.penghuniId === penghuni.id && p.bulan === bulan && p.tahun === tahun);
-      
-      if (!bill) {
-        // Create missing bill automatically
-        bill = {
-          id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
-          penghuniId: penghuni.id,
-          kamarId: kamar.id,
-          bulan,
-          tahun,
-          jumlah: kamar.hargaPerBulan,
-          tanggalBayar: null,
-          status: "belum_bayar",
-          createdAt: new Date().toISOString()
-        };
-        globalDataPembayaran.push(bill);
-        isModified = true;
-      }
-      
-      // Cek apakah status perlu diubah menjadi 'terlambat'
-      if (bill.status === "belum_bayar" || bill.status === "terlambat") {
-        const dueDate = new Date(tahun, bulanIndex, dueDay);
-        // Tambahkan toleransi waktu (akhir hari due date)
-        dueDate.setHours(23, 59, 59, 999);
-        
-        if (now > dueDate && bill.status !== "terlambat") {
-          bill.status = "terlambat";
-          isModified = true;
-        } else if (now <= dueDate && bill.status === "terlambat") {
-          bill.status = "belum_bayar";
-          isModified = true;
-        }
-      }
-      
-      currDate.setMonth(currDate.getMonth() + 1);
-    }
-  });
-
-  if (isModified) {
-    notifyListeners([...globalDataPembayaran]);
-  }
-};
 
 export const usePembayaran = () => {
-  const [dataPembayaran, setDataPembayaran] = useState<Pembayaran[]>(globalDataPembayaran);
+  const [dataPembayaran, setDataPembayaran] = useState<Pembayaran[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    setDataPembayaran([...globalDataPembayaran]);
-    listeners.push(setDataPembayaran);
-    return () => {
-      listeners = listeners.filter(l => l !== setDataPembayaran);
-    };
+  const fetchPembayaran = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      // 1. Trigger auto-generation on server
+      await fetch('/api/pembayaran/generate', { method: 'POST' });
+      
+      // 2. Fetch the updated payments list
+      const response = await fetch('/api/pembayaran');
+      if (!response.ok) {
+        throw new Error('Gagal mengambil data pembayaran');
+      }
+      const data = await response.json();
+      setDataPembayaran(data);
+    } catch (err: any) {
+      setError(err.message || 'Terjadi kesalahan');
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  const getPembayaranById = (id: string) => globalDataPembayaran.find(p => p.id === id);
+  useEffect(() => {
+    fetchPembayaran();
+  }, [fetchPembayaran]);
 
-  const addPembayaran = (pembayaran: Omit<Pembayaran, 'id' | 'createdAt'>) => {
-    const newPembayaran: Pembayaran = {
-      ...pembayaran,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
-    };
-    notifyListeners([...globalDataPembayaran, newPembayaran]);
+  const getPembayaranById = (id: string) => dataPembayaran.find(p => p.id === id);
+
+  const addPembayaran = async (pembayaran: Omit<Pembayaran, 'id' | 'createdAt'>) => {
+    try {
+      const response = await fetch('/api/pembayaran', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(pembayaran),
+      });
+      if (!response.ok) {
+        throw new Error('Gagal menambah data pembayaran');
+      }
+      await fetchPembayaran();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const updatePembayaran = (id: string, updatedData: Partial<Pembayaran>) => {
-    notifyListeners(globalDataPembayaran.map(p => p.id === id ? { ...p, ...updatedData } : p));
+  const updatePembayaran = async (id: string, updatedData: Partial<Pembayaran>) => {
+    try {
+      const response = await fetch(`/api/pembayaran/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedData),
+      });
+      if (!response.ok) {
+        throw new Error('Gagal memperbarui data pembayaran');
+      }
+      await fetchPembayaran();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const deletePembayaran = (id: string) => {
-    notifyListeners(globalDataPembayaran.filter(p => p.id !== id));
+  const deletePembayaran = async (id: string) => {
+    try {
+      const response = await fetch(`/api/pembayaran/${id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Gagal menghapus data pembayaran');
+      }
+      await fetchPembayaran();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const deletePembayaranByPenghuniId = (penghuniId: string) => {
-    notifyListeners(globalDataPembayaran.filter(p => p.penghuniId !== penghuniId));
+  const deletePembayaranByPenghuniId = async (penghuniId: string) => {
+    // This is handled automatically by cascade delete on the server side when deleting a tenant,
+    // but we can also trigger individual deletes if needed.
+    try {
+      const related = dataPembayaran.filter(p => p.penghuniId === penghuniId);
+      await Promise.all(related.map(p => fetch(`/api/pembayaran/${p.id}`, { method: 'DELETE' })));
+      await fetchPembayaran();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return {
     dataPembayaran,
+    isLoading,
+    error,
     getPembayaranById,
     addPembayaran,
     updatePembayaran,
     deletePembayaran,
     deletePembayaranByPenghuniId,
+    refresh: fetchPembayaran,
   };
 };
