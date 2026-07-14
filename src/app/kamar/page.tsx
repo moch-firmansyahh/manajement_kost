@@ -5,7 +5,8 @@ import { useKamar } from "@/hooks/useKamar";
 import { KamarTable } from "@/components/kamar/KamarTable";
 import { KamarForm } from "@/components/kamar/KamarForm";
 import { Button } from "@/components/ui/button";
-import { Plus, Filter, AlertCircle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Plus, Filter, AlertCircle, Search } from "lucide-react";
 import { Kamar, StatusKamar } from "@/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -15,11 +16,23 @@ export default function KamarPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingData, setEditingData] = useState<Kamar | null>(null);
   const [filterStatus, setFilterStatus] = useState<StatusKamar | "semua">("semua");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  // Filter data kamar sesuai status yang dipilih
-  const filteredData = filterStatus === "semua" 
-    ? dataKamar 
-    : dataKamar.filter(k => k.status === filterStatus);
+  // Filter data kamar sesuai status dan pencarian nomor/tipe kamar yang dipilih
+  const filteredData = dataKamar.filter(k => {
+    // 1. Saring berdasarkan status kamar
+    if (filterStatus !== "semua" && k.status !== filterStatus) return false;
+    
+    // 2. Saring berdasarkan kolom pencarian (nomor kamar atau tipe kamar)
+    if (searchQuery.trim() !== "") {
+      const query = searchQuery.toLowerCase();
+      const nomorCocok = k.nomorKamar.toLowerCase().includes(query);
+      const tipeCocok = k.tipe.toLowerCase().includes(query);
+      if (!nomorCocok && !tipeCocok) return false;
+    }
+    
+    return true;
+  });
 
   // Menangani aksi edit kamar
   const handleEdit = (kamar: Kamar) => {
@@ -82,22 +95,36 @@ export default function KamarPage() {
         </Button>
       </div>
 
-      <div className="flex items-center gap-2 max-w-xs">
-        <Filter className="h-4 w-4 text-muted-foreground" />
-        <Select 
-          value={filterStatus} 
-          onValueChange={(value) => setFilterStatus(value as StatusKamar | "semua")}
-        >
-          <SelectTrigger className="bg-background border-border">
-            <SelectValue placeholder="Filter Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="semua">Semua Status</SelectItem>
-            <SelectItem value="tersedia">Tersedia</SelectItem>
-            <SelectItem value="terisi">Terisi</SelectItem>
-            <SelectItem value="maintenance">Maintenance</SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        {/* Filter Status Kamar */}
+        <div className="flex items-center gap-2 w-full sm:max-w-[200px]">
+          <Filter className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+          <Select 
+            value={filterStatus} 
+            onValueChange={(value) => setFilterStatus(value as StatusKamar | "semua")}
+          >
+            <SelectTrigger className="bg-background border-border w-full">
+              <SelectValue placeholder="Filter Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="semua">Semua Status</SelectItem>
+              <SelectItem value="tersedia">Tersedia</SelectItem>
+              <SelectItem value="terisi">Terisi</SelectItem>
+              <SelectItem value="maintenance">Maintenance</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Kolom Pencarian Nomor / Tipe Kamar */}
+        <div className="flex items-center w-full sm:max-w-sm relative group">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+          <Input 
+            placeholder="Cari nomor atau tipe kamar..." 
+            className="pl-10 bg-background border-border focus-visible:ring-primary w-full"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
       </div>
 
       <KamarTable 
