@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, Edit, Trash2, LogOut } from "lucide-react";
-import Link from "next/link";
+import { TransitionLink } from "@/components/ui/TransitionLink";
 
 interface PenghuniTableProps {
   data: Penghuni[];
@@ -61,9 +61,9 @@ export const PenghuniTable = ({ data, dataKamar, onEdit, onDelete, onCheckout }:
                     </Button>
                   )}
                   <Button variant="ghost" size="icon" asChild className="text-primary hover:bg-primary/10 dark:hover:bg-primary/20">
-                    <Link href={`/penghuni/${penghuni.id}`} prefetch={true}>
+                    <TransitionLink href={`/penghuni/${penghuni.id}`}>
                       <Eye className="h-4 w-4" />
-                    </Link>
+                    </TransitionLink>
                   </Button>
                   <Button variant="ghost" size="icon" onClick={() => onEdit(penghuni)} className="text-amber-600 hover:text-amber-700 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-900/50">
                     <Edit className="h-4 w-4" />

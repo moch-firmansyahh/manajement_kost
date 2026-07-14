@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { LayoutDashboard, BedDouble, Users, CreditCard, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { TransitionLink } from '@/components/ui/TransitionLink';
 
 const navItems = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
@@ -30,7 +31,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
       )}
     >
       <div className="h-20 flex items-center justify-between px-6 border-b border-border">
-        <Link href="/" className="flex items-center justify-center w-full h-full py-2">
+        <TransitionLink href="/" className="flex items-center justify-center w-full h-full py-2">
           <Image 
             src="/Logo-Kost.png" 
             alt="Logo Kontrakan Pa Iman" 
@@ -38,7 +39,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
             height={80} 
             className="object-contain w-full h-full max-h-16"
           />
-        </Link>
+        </TransitionLink>
         <Button 
           variant="ghost" 
           size="icon" 
@@ -55,10 +56,9 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
           const Icon = item.icon;
           
           return (
-            <Link
+            <TransitionLink
               key={item.name}
               href={item.href}
-              prefetch={true}
               onClick={() => {
                 // Tutup sidebar di mobile saat menu diklik
                 if (window.innerWidth < 768) setIsOpen(false);
@@ -77,7 +77,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                 )} 
               />
               {item.name}
-            </Link>
+            </TransitionLink>
           );
         })}
       </nav>

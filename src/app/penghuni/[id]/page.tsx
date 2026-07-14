@@ -8,7 +8,7 @@ import { formatDate, formatRupiah } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, User, Phone, Mail, CreditCard, CalendarDays, Filter } from "lucide-react";
-import Link from "next/link";
+import { TransitionLink } from "@/components/ui/TransitionLink";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -31,7 +31,7 @@ export default function PenghuniDetailPage({ params }: { params: Promise<{ id: s
       <div className="flex flex-col items-center justify-center h-64">
         <h2 className="text-xl font-semibold text-muted-foreground">Penghuni tidak ditemukan</h2>
         <Button variant="link" asChild className="mt-4">
-          <Link href="/penghuni">Kembali ke Daftar Penghuni</Link>
+        <TransitionLink href="/penghuni">Kembali ke Daftar Penghuni</TransitionLink>
         </Button>
       </div>
     );
@@ -53,7 +53,7 @@ export default function PenghuniDetailPage({ params }: { params: Promise<{ id: s
     <div className="space-y-6">
       <div className="flex items-center space-x-4">
         <Button variant="ghost" size="icon" asChild>
-          <Link href="/penghuni"><ArrowLeft className="h-5 w-5" /></Link>
+          <TransitionLink href="/penghuni"><ArrowLeft className="h-5 w-5" /></TransitionLink>
         </Button>
         <div>
           <h1 className="text-2xl font-bold text-foreground tracking-tight">Detail Penghuni</h1>

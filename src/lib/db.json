@@ -1,0 +1,123 @@
+{
+  "kamar": [
+    {
+      "id": "1",
+      "nomorKamar": "101",
+      "lantai": 1,
+      "tipe": "Standard",
+      "hargaPerBulan": 800000,
+      "fasilitas": [
+        "Kasur",
+        "Lemari",
+        "Kipas Angin",
+        "Kamar Mandi Luar"
+      ],
+      "status": "terisi",
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "nomorKamar": "102",
+      "lantai": 1,
+      "tipe": "Deluxe",
+      "hargaPerBulan": 1200000,
+      "fasilitas": [
+        "Kasur",
+        "Lemari",
+        "AC",
+        "WiFi",
+        "Kamar Mandi Dalam"
+      ],
+      "status": "tersedia",
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "3",
+      "nomorKamar": "201",
+      "lantai": 2,
+      "tipe": "VIP",
+      "hargaPerBulan": 1500000,
+      "fasilitas": [
+        "Kasur Springbed",
+        "Lemari",
+        "AC",
+        "WiFi",
+        "TV",
+        "Kamar Mandi Dalam",
+        "Water Heater"
+      ],
+      "status": "maintenance",
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "penghuni": [
+    {
+      "id": "1",
+      "nama": "Budi Santoso",
+      "nik": "3201010101010001",
+      "noTelepon": "081234567890",
+      "email": "budi@example.com",
+      "kamarId": "1",
+      "tanggalMasuk": "2026-03-01T00:00:00.000Z",
+      "tanggalKeluar": null,
+      "createdAt": "2026-03-01T00:00:00.000Z"
+    }
+  ],
+  "pembayaran": [
+    {
+      "id": "17840045010944zmjavq",
+      "penghuniId": "1",
+      "kamarId": "1",
+      "bulan": "April",
+      "tahun": 2026,
+      "jumlah": 800000,
+      "tanggalBayar": null,
+      "status": "terlambat",
+      "createdAt": "2026-07-14T04:48:21.094Z"
+    },
+    {
+      "id": "1784004501094xh83rmw",
+      "penghuniId": "1",
+      "kamarId": "1",
+      "bulan": "Mei",
+      "tahun": 2026,
+      "jumlah": 800000,
+      "tanggalBayar": null,
+      "status": "terlambat",
+      "createdAt": "2026-07-14T04:48:21.094Z"
+    },
+    {
+      "id": "1784004501094ku0566r",
+      "penghuniId": "1",
+      "kamarId": "1",
+      "bulan": "Juni",
+      "tahun": 2026,
+      "jumlah": 800000,
+      "tanggalBayar": null,
+      "status": "terlambat",
+      "createdAt": "2026-07-14T04:48:21.094Z"
+    },
+    {
+      "id": "1784004501094f9fhj9x",
+      "penghuniId": "1",
+      "kamarId": "1",
+      "bulan": "Juli",
+      "tahun": 2026,
+      "jumlah": 800000,
+      "tanggalBayar": null,
+      "status": "terlambat",
+      "createdAt": "2026-07-14T04:48:21.094Z"
+    },
+    {
+      "id": "1784004501094wr6eg7r",
+      "penghuniId": "1",
+      "kamarId": "1",
+      "bulan": "Agustus",
+      "tahun": 2026,
+      "jumlah": 800000,
+      "tanggalBayar": null,
+      "status": "belum_bayar",
+      "createdAt": "2026-07-14T04:48:21.094Z"
+    }
+  ]
+}

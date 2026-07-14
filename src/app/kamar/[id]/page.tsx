@@ -9,7 +9,7 @@ import { formatRupiah, formatDate } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
-import Link from "next/link";
+import { TransitionLink } from "@/components/ui/TransitionLink";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 
@@ -28,7 +28,7 @@ export default function KamarDetailPage({ params }: { params: Promise<{ id: stri
       <div className="flex flex-col items-center justify-center h-64">
         <h2 className="text-xl font-semibold text-muted-foreground">Kamar tidak ditemukan</h2>
         <Button variant="link" asChild className="mt-4">
-          <Link href="/kamar">Kembali ke Daftar Kamar</Link>
+        <TransitionLink href="/kamar">Kembali ke Daftar Kamar</TransitionLink>
         </Button>
       </div>
     );
@@ -41,7 +41,7 @@ export default function KamarDetailPage({ params }: { params: Promise<{ id: stri
     <div className="space-y-6">
       <div className="flex items-center space-x-4">
         <Button variant="ghost" size="icon" asChild>
-          <Link href="/kamar"><ArrowLeft className="h-5 w-5" /></Link>
+          <TransitionLink href="/kamar"><ArrowLeft className="h-5 w-5" /></TransitionLink>
         </Button>
         <div>
           <h1 className="text-2xl font-bold text-foreground tracking-tight">Detail Kamar {kamar.nomorKamar}</h1>

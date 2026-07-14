@@ -11,6 +11,8 @@ export const metadata: Metadata = {
   description: "Aplikasi manajemen kost berbasis web untuk pemilik kost.",
 };
 
+import { RouteTransitionProvider } from "@/components/RouteTransitionProvider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -27,7 +29,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <MainLayoutClient>{children}</MainLayoutClient>
+          <RouteTransitionProvider>
+            <MainLayoutClient>{children}</MainLayoutClient>
+          </RouteTransitionProvider>
         </ThemeProvider>
       </body>
     </html>

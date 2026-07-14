@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { TransitionLink } from '@/components/ui/TransitionLink';
 import { usePembayaran } from '@/hooks/usePembayaran';
 import { usePenghuni } from '@/hooks/usePenghuni';
 import {
@@ -109,20 +110,20 @@ export const Navbar = ({ toggleSidebar }: NavbarProps) => {
               <>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="w-full justify-center text-xs cursor-pointer text-muted-foreground" asChild>
-                  <Link href="/pembayaran">
+                  <TransitionLink href="/pembayaran">
                     Lihat Semua Tagihan
-                  </Link>
+                  </TransitionLink>
                 </DropdownMenuItem>
               </>
             )}
           </DropdownMenuContent>
         </DropdownMenu>
         
-        <Link href="/profile">
+        <TransitionLink href="/profile">
           <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-primary to-primary/80 flex items-center justify-center text-white font-medium text-sm shadow-sm ring-2 ring-background cursor-pointer hover:shadow-md transition-all hover:scale-105">
             A
           </div>
-        </Link>
+        </TransitionLink>
       </div>
     </header>
   );

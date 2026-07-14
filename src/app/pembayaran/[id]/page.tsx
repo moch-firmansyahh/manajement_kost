@@ -9,7 +9,7 @@ import { formatDate, formatRupiah } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ReceiptText, User, BedDouble } from "lucide-react";
-import Link from "next/link";
+import { TransitionLink } from "@/components/ui/TransitionLink";
 
 export default function PembayaranDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -26,7 +26,7 @@ export default function PembayaranDetailPage({ params }: { params: Promise<{ id:
       <div className="flex flex-col items-center justify-center h-64">
         <h2 className="text-xl font-semibold text-muted-foreground">Pembayaran tidak ditemukan</h2>
         <Button variant="link" asChild className="mt-4">
-          <Link href="/pembayaran">Kembali ke Daftar Pembayaran</Link>
+        <TransitionLink href="/pembayaran">Kembali ke Daftar Pembayaran</TransitionLink>
         </Button>
       </div>
     );
@@ -39,7 +39,7 @@ export default function PembayaranDetailPage({ params }: { params: Promise<{ id:
     <div className="space-y-6">
       <div className="flex items-center space-x-4">
         <Button variant="ghost" size="icon" asChild>
-          <Link href="/pembayaran"><ArrowLeft className="h-5 w-5" /></Link>
+          <TransitionLink href="/pembayaran"><ArrowLeft className="h-5 w-5" /></TransitionLink>
         </Button>
         <div>
           <h1 className="text-2xl font-bold text-foreground tracking-tight">Detail Pembayaran</h1>

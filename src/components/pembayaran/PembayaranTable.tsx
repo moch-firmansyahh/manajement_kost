@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { StatusBadge } from "./StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Eye, Edit, Trash2 } from "lucide-react";
-import Link from "next/link";
+import { TransitionLink } from "@/components/ui/TransitionLink";
 
 interface PembayaranTableProps {
   data: Pembayaran[];
@@ -79,9 +79,9 @@ export const PembayaranTable = ({ data, dataPenghuni, dataKamar, onEdit, onDelet
                 </TableCell>
                 <TableCell className="text-right space-x-2">
                   <Button variant="ghost" size="icon" asChild className="text-primary hover:bg-primary/10 dark:hover:bg-primary/20">
-                    <Link href={`/pembayaran/${bayar.id}`} prefetch={true}>
+                    <TransitionLink href={`/pembayaran/${bayar.id}`}>
                       <Eye className="h-4 w-4" />
-                    </Link>
+                    </TransitionLink>
                   </Button>
                   <Button variant="ghost" size="icon" onClick={() => onEdit(bayar)} className="text-amber-600 hover:text-amber-700 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-900/50">
                     <Edit className="h-4 w-4" />
