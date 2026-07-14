@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, ArrowLeft, Check, X, ShieldCheck } from "lucide-react";
+import Link from "next/link";
 import { TransitionLink } from "@/components/ui/TransitionLink";
 
 export default function GantiSandiPage() {
@@ -73,9 +74,9 @@ export default function GantiSandiPage() {
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="flex items-center space-x-4">
         <Button variant="outline" size="icon" asChild>
-          <TransitionLink href="/profile">
+          <Link href="/profile">
             <ArrowLeft className="h-4 w-4" />
-          </TransitionLink>
+          </Link>
         </Button>
         <div>
           <h1 className="text-2xl font-bold text-foreground tracking-tight">Perbarui Kata Sandi</h1>

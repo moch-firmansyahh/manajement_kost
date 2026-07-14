@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { User, Mail, Shield, LogOut, Key } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { TransitionLink } from "@/components/ui/TransitionLink";
 
 export default function ProfilePage() {
@@ -73,10 +74,10 @@ export default function ProfilePage() {
                 asChild
                 className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
-                <TransitionLink href="/profile/ganti-sandi">
+                <Link href="/profile/ganti-sandi">
                   <Key className="mr-2 h-4 w-4" />
                   Perbarui Kata Sandi
-                </TransitionLink>
+                </Link>
               </Button>
             </div>
           </CardContent>
