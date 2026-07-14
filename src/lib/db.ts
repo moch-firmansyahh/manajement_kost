@@ -184,21 +184,20 @@ function buatDbDefault(): DbSchema {
       const tahun = currYear;
       const jumlah = assignedRoom.hargaPerBulan;
       
-      // Penentuan status bayar secara acak untuk variasi data:
+      // Penentuan status bayar secara acak untuk variasi data yang realistis:
       let status: StatusPembayaran = "lunas";
-      const isRecent = currYear === 2026 && currMonthIdx >= 5;
+      const isJune2026 = currYear === 2026 && currMonthIdx === 5; // Juni 2026
+      const isJuly2026 = currYear === 2026 && currMonthIdx === 6; // Juli 2026
       
-      if (isRecent) {
-        status = Math.random() > 0.5 ? "lunas" : "belum_bayar";
+      if (isJune2026) {
+        // Bulan Juni (sudah lewat jatuh tempo) hanya bisa lunas atau terlambat
+        status = Math.random() < 0.85 ? "lunas" : "terlambat";
+      } else if (isJuly2026) {
+        // Bulan Juli (bulan berjalan) bisa lunas atau belum bayar
+        status = Math.random() < 0.6 ? "lunas" : "belum_bayar";
       } else {
-        const rand = Math.random();
-        if (rand < 0.85) {
-          status = "lunas";
-        } else if (rand < 0.95) {
-          status = "belum_bayar";
-        } else {
-          status = "terlambat";
-        }
+        // Seluruh tagihan sebelum Juni 2026 dipaksa lunas karena sudah selesai di masa lalu
+        status = "lunas";
       }
 
       let tanggalBayar: string | null = null;

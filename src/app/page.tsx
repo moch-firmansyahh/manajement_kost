@@ -170,11 +170,12 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             {tagihanBulanDepan.length > 0 ? (
-              <div className="max-h-[310px] overflow-y-auto pr-1">
+              <div className="max-h-[245px] overflow-y-auto pr-1">
                 <Table className="min-w-[400px]">
                   <TableHeader className="sticky top-0 bg-card z-10">
                     <TableRow>
                       <TableHead>Penghuni</TableHead>
+                      <TableHead>Kamar</TableHead>
                       <TableHead>Bulan</TableHead>
                       <TableHead>Jumlah</TableHead>
                       <TableHead>Status</TableHead>
@@ -183,9 +184,11 @@ export default function Dashboard() {
                   <TableBody>
                     {tagihanBulanDepan.map((bayar) => {
                       const penghuni = dataPenghuni.find(p => p.id === bayar.penghuniId);
+                      const kamar = dataKamar.find(k => k.id === bayar.kamarId);
                       return (
                         <TableRow key={bayar.id}>
                           <TableCell className="font-medium text-foreground">{penghuni ? penghuni.nama : "-"}</TableCell>
+                          <TableCell className="text-muted-foreground">{kamar ? kamar.nomorKamar : "-"}</TableCell>
                           <TableCell className="text-muted-foreground">{bayar.bulan}</TableCell>
                           <TableCell className="text-muted-foreground">{formatRupiah(bayar.jumlah)}</TableCell>
                           <TableCell>
