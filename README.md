@@ -1,132 +1,110 @@
-# Manajemen Kost
+<div align="center">
+  <img src="public/Logo-Kost.png" alt="Logo Kontrakan Pa Iman" width="280" />
 
-Aplikasi web untuk pemilik kost dalam mengelola kamar, penghuni, dan pembayaran sewa bulanan secara digital. Dilengkapi dashboard statistik dan CRUD lengkap untuk setiap entitas.
+  # Manajemen Kost - Kontrakan Pa Iman
 
-## Tech Stack
+  Aplikasi web berbasis Next.js untuk pengelola/pemilik kost dalam memantau kamar, data penghuni, serta pencatatan tagihan sewa bulanan secara digital dan terintegrasi.
+</div>
 
-- [Next.js 15](https://nextjs.org/) - React Framework
-- [TypeScript](https://www.typescriptlang.org/) - Type Safety
-- [Tailwind CSS](https://tailwindcss.com/) - Styling
-- [ShadcnUI](https://ui.shadcn.com/) - UI Library
+---
 
-## Fitur Utama
+## 🚀 Fitur Utama
 
-- Dashboard statistik (total kamar, kamar terisi, kamar kosong, pendapatan bulan ini)
-- Manajemen kamar (tambah, lihat detail, edit, hapus)
-- Manajemen penghuni (tambah, lihat profil, edit, hapus)
-- Pencatatan pembayaran sewa bulanan (tambah, lihat riwayat, edit, hapus)
-- Status pembayaran (lunas, belum bayar, terlambat)
-- Filter dan pencarian data penghuni
+- **Dashboard Statistik**: Memantau total kamar, kamar kosong vs terisi, serta akumulasi pendapatan sewa secara real-time.
+- **Manajemen Kamar (CRUD)**: Pendataan nomor kamar, lantai, tipe, harga per bulan, fasilitas kustom, dan status kesiapan kamar.
+- **Manajemen Penghuni (CRUD)**: Registrasi data NIK, nomor telepon, tanggal masuk, status keaktifan, dan riwayat kamar yang pernah disewa.
+- **Sistem Billing Pembayaran**: Auto-generation tagihan bulanan berjalan, pencatatan transaksi masuk, filter tahun/status bayar, serta pencarian instan nama penyewa.
+- **Route Transitions & HouseLoader**: Pengalaman animasi gambar garis rumah SVG premium saat awal masuk aplikasi, memuat dashboard, dan perpindahan rute inti.
+- **Lightweight Hooks Caching**: Optimasi kinerja frontend menggunakan module-level cache & event listeners pada hooks (`useKamar`, `usePenghuni`, `usePembayaran`) untuk mengeliminasi duplikasi request API dan lag secara total.
 
-## Struktur Folder
+---
+
+## 🛠️ Tech Stack
+
+- **Framework**: [Next.js 15 (App Router)](https://nextjs.org/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **UI Library**: [ShadcnUI](https://ui.shadcn.com/)
+- **Data Store**: Local State & API Route Handlers (Persistensi file `db.json` dengan programmatic seeding data awal)
+
+---
+
+## 📂 Struktur Folder Proyek
 
 ```
 manajemen-kost/
 ├── src/
 │   ├── app/
-│   │   ├── layout.tsx
-│   │   ├── page.tsx
-│   │   ├── kamar/
-│   │   │   ├── page.tsx
-│   │   │   └── [id]/
-│   │   │       └── page.tsx
-│   │   ├── penghuni/
-│   │   │   ├── page.tsx
-│   │   │   └── [id]/
-│   │   │       └── page.tsx
-│   │   └── pembayaran/
-│   │       ├── page.tsx
-│   │       └── [id]/
-│   │           └── page.tsx
+│   │   ├── layout.tsx              # Root layout dengan sidebar & transisi rute
+│   │   ├── page.tsx                # Halaman dashboard utama
+│   │   ├── loading.tsx             # Penanganan status loading Next.js
+│   │   ├── error.tsx               # Batasan kesalahan runtime
+│   │   ├── not-found.tsx           # Halaman 404 kustom
+│   │   ├── kamar/                  # Halaman daftar & detail kamar ([id])
+│   │   ├── penghuni/               # Halaman daftar & detail penghuni ([id])
+│   │   ├── pembayaran/             # Halaman daftar & detail pembayaran ([id])
+│   │   └── api/                    # Route Handlers API (kamar, penghuni, pembayaran)
 │   ├── components/
-│   │   ├── ui/
-│   │   ├── layout/
-│   │   │   ├── Sidebar.tsx
-│   │   │   └── Navbar.tsx
-│   │   ├── kamar/
-│   │   │   ├── KamarCard.tsx
-│   │   │   ├── KamarForm.tsx
-│   │   │   └── KamarTable.tsx
-│   │   ├── penghuni/
-│   │   │   ├── PenghuniCard.tsx
-│   │   │   ├── PenghuniForm.tsx
-│   │   │   └── PenghuniTable.tsx
-│   │   └── pembayaran/
-│   │       ├── PembayaranForm.tsx
-│   │       └── PembayaranTable.tsx
-│   ├── lib/
-│   │   └── utils.ts
+│   │   ├── ui/                     # Komponen primitif ShadcnUI
+│   │   ├── layout/                 # Sidebar.tsx & Navbar.tsx
+│   │   ├── kamar/                  # KamarTable.tsx & KamarForm.tsx
+│   │   ├── penghuni/               # PenghuniTable.tsx & PenghuniForm.tsx
+│   │   └── pembayaran/             # PembayaranTable.tsx & PembayaranForm.tsx
 │   ├── hooks/
-│   │   ├── useKamar.ts
-│   │   ├── usePenghuni.ts
-│   │   └── usePembayaran.ts
+│   │   ├── useKamar.ts             # Custom hook kamar + cache level modul
+│   │   ├── usePenghuni.ts          # Custom hook penghuni + cache level modul
+│   │   └── usePembayaran.ts        # Custom hook pembayaran + cache level modul
 │   └── types/
-│       └── index.ts
-├── public/
-├── .eslintrc.json
-├── next.config.ts
-├── tailwind.config.ts
-├── tsconfig.json
-└── package.json
+│       └── index.ts                # Definisi interface TypeScript global
 ```
 
-## Cara Menjalankan Project
+---
 
-### Prerequisites
+## ⚡ Cara Menjalankan Proyek
 
-Pastikan sudah terinstall:
-
+### Prasyarat (Prerequisites)
 - Node.js versi 18 ke atas
 - npm atau yarn
 
-### Instalasi
+### Instalasi & Menjalankan Local Server
 
-1. Clone repository ini
+1. **Clone repository ini**:
+   ```bash
+   git clone https://github.com/moch-firmansyahh/manajement_kost.git
+   ```
 
-```bash
-git clone https://github.com/username/manajemen-kost.git
-```
+2. **Masuk ke direktori proyek**:
+   ```bash
+   cd manajement_kost
+   ```
 
-2. Masuk ke folder project
+3. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-```bash
-cd manajemen-kost
-```
+4. **Jalankan development server**:
+   ```bash
+   npm run dev
+   ```
 
-3. Install dependencies
+5. **Buka di browser**:
+   Akses [http://localhost:3000](http://localhost:3000)
 
-```bash
-npm install
-```
+---
 
-4. Install ShadcnUI
+## 📊 Kriteria Penilaian CCI
 
-```bash
-npx shadcn@latest init
-```
+| Komponen Evaluasi | Detail Implementasi & Kustomisasi |
+| ----------------- | -------------------------------- |
+| **TailwindCSS & Responsive** | Antarmuka adaptif penuh dengan breakpoint `sm`, `md`, `lg`. |
+| **Component & Hooks** | Struktur kode modular dengan caching listeners agar terbebas dari lag. |
+| **Routing & App Router** | Halaman dinamis dengan struktur `[id]` dan transisi rute khusus. |
+| **Data Fetching API** | Penggunaan Fetch API asinkron pada hooks ke Route Handlers internal. |
+| **Conditional Rendering** | Pembedaan status kamar, indikator badge bayar, dan loading screen. |
 
-5. Jalankan development server
+---
 
-```bash
-npm run dev
-```
+## 🧑‍💻 Author
 
-6. Buka browser dan akses
-
-```
-http://localhost:3000
-```
-
-## Implementasi Teori
-
-| Teori                           | Implementasi                                                                          |
-| ------------------------------- | ------------------------------------------------------------------------------------- |
-| TailwindCSS & Responsive Design | Seluruh halaman menggunakan Tailwind dengan breakpoint sm, md, lg                     |
-| Component & Hooks               | Komponen reusable di folder components/, custom hooks di folder hooks/                |
-| Routing & Dynamic Routing       | App Router Next.js dengan dynamic route [id] untuk detail kamar, penghuni, pembayaran |
-| Data Fetching                   | useEffect untuk fetch data dari API routes atau JSON lokal                            |
-| Conditional Rendering           | Tampilan berbeda berdasarkan status kamar dan status pembayaran                       |
-
-## Author
-
-Moch Firmansyah - 103012400137 - IF-48-08 - Telkom University
+**Moch Firmansyah** - *103012400137* - IF-48-08 - Telkom University
