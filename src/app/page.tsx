@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 
+// Halaman utama Dashboard pemilik kost
 export default function Dashboard() {
   const { dataKamar, isLoading: loadingKamar, error: errorKamar } = useKamar();
   const { dataPenghuni, isLoading: loadingPenghuni, error: errorPenghuni } = usePenghuni();
@@ -26,6 +27,7 @@ export default function Dashboard() {
   const currentMonthIndex = new Date().getMonth();
   const currentYear = new Date().getFullYear();
   
+  // Pendapatan bulan berjalan (total pembayaran lunas di bulan & tahun saat ini)
   const pendapatanBulanIni = dataPembayaran
     .filter(p => {
       if (p.status !== "lunas" || !p.tanggalBayar) return false;
@@ -34,12 +36,29 @@ export default function Dashboard() {
     })
     .reduce((acc, curr) => acc + curr.jumlah, 0);
 
-  const unpaidPembayaran = dataPembayaran.filter(p => p.status === "terlambat");
+  // Menentukan bulan & tahun untuk bulan depan
+  const targetBulanDepan = new Date(currentYear, currentMonthIndex + 1, 1);
+  const namaBulanDepan = namaBulan[targetBulanDepan.getMonth()];
+  const tahunDepan = targetBulanDepan.getFullYear();
+
+  // Menyaring daftar penghuni aktif yang belum membayar tagihan bulan depan
+  const tagihanBulanDepan = dataPembayaran.filter(p => {
+    // 1. Tagihan harus sesuai bulan depan & tahun depan
+    if (p.bulan !== namaBulanDepan || p.tahun !== tahunDepan) return false;
+    
+    // 2. Status tagihan harus 'belum_bayar'
+    if (p.status !== "belum_bayar") return false;
+
+    // 3. Pastikan penghuni masih aktif (belum keluar)
+    const penghuni = dataPenghuni.find(pengh => pengh.id === p.penghuniId);
+    return penghuni && !penghuni.tanggalKeluar;
+  });
 
   const now = new Date();
   const oneMonthAgo = new Date();
   oneMonthAgo.setMonth(now.getMonth() - 1);
 
+  // Menyaring 5 penghuni yang baru masuk dalam sebulan terakhir
   const penghuniTerbaru = dataPenghuni
     .filter(p => new Date(p.tanggalMasuk) >= oneMonthAgo)
     .sort((a, b) => new Date(b.tanggalMasuk).getTime() - new Date(a.tanggalMasuk).getTime())
@@ -107,6 +126,7 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Card Penghuni Terbaru */}
         <Card className="border-border shadow-sm">
           <CardHeader>
             <CardTitle className="text-lg font-semibold text-foreground">Penghuni Terbaru</CardTitle>
@@ -140,41 +160,47 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
+        {/* Card Tagihan Bulan Depan dengan scroll bar jika > 5 */}
         <Card className="border-border shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold text-foreground">Tagihan Belum Lunas</CardTitle>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg font-semibold text-foreground flex justify-between items-center">
+              <span>Tagihan Bulan Depan</span>
+              <span className="text-xs font-normal text-muted-foreground">({namaBulanDepan} {tahunDepan})</span>
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            {unpaidPembayaran.length > 0 ? (
-              <Table className="min-w-[400px]">
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Penghuni</TableHead>
-                    <TableHead>Bulan</TableHead>
-                    <TableHead>Jumlah</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {unpaidPembayaran.slice(0, 5).map((bayar) => {
-                    const penghuni = dataPenghuni.find(p => p.id === bayar.penghuniId);
-                    return (
-                      <TableRow key={bayar.id}>
-                        <TableCell className="font-medium text-foreground">{penghuni ? penghuni.nama : "-"}</TableCell>
-                        <TableCell className="text-muted-foreground">{bayar.bulan}</TableCell>
-                        <TableCell className="text-muted-foreground">{formatRupiah(bayar.jumlah)}</TableCell>
-                        <TableCell>
-                          <Badge variant="destructive" className="bg-destructive/10 text-destructive hover:bg-destructive/20 border-none">
-                            {bayar.status.replace("_", " ")}
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
+            {tagihanBulanDepan.length > 0 ? (
+              <div className="max-h-[310px] overflow-y-auto pr-1">
+                <Table className="min-w-[400px]">
+                  <TableHeader className="sticky top-0 bg-card z-10">
+                    <TableRow>
+                      <TableHead>Penghuni</TableHead>
+                      <TableHead>Bulan</TableHead>
+                      <TableHead>Jumlah</TableHead>
+                      <TableHead>Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {tagihanBulanDepan.map((bayar) => {
+                      const penghuni = dataPenghuni.find(p => p.id === bayar.penghuniId);
+                      return (
+                        <TableRow key={bayar.id}>
+                          <TableCell className="font-medium text-foreground">{penghuni ? penghuni.nama : "-"}</TableCell>
+                          <TableCell className="text-muted-foreground">{bayar.bulan}</TableCell>
+                          <TableCell className="text-muted-foreground">{formatRupiah(bayar.jumlah)}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="bg-yellow-500/10 text-yellow-600 hover:bg-yellow-500/20 border-none">
+                              {bayar.status.replace("_", " ")}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
             ) : (
-              <div className="text-center py-6 text-muted-foreground">Semua tagihan sudah lunas 🎉</div>
+              <div className="text-center py-6 text-muted-foreground">Tidak ada tagihan bulan depan yang belum dibayar 🎉</div>
             )}
           </CardContent>
         </Card>
