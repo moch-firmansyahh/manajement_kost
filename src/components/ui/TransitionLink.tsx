@@ -29,10 +29,10 @@ export function TransitionLink({ children, href, className, ...props }: Transiti
       return;
     }
 
-    // Mulai navigasi SEGERA setelah loader muncul (300ms cukup untuk loader terlihat)
+    // Mulai navigasi SEGERA setelah loader muncul (100ms cukup untuk transisi terlihat tanpa lag)
     setTimeout(() => {
       router.push(href.toString());
-    }, 300);
+    }, 100);
   };
 
   return (

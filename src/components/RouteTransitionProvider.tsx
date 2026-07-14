@@ -39,7 +39,7 @@ export function RouteTransitionProvider({ children }: { children: React.ReactNod
         setIsTransitioning(false);
         setIsInitialMount(false);
       }, 300);
-    }, 1500); // Garansi 1.5 detik F5
+    }, 400); // Dikurangi dari 1500ms menjadi 400ms agar instan & tidak lag
     return () => clearTimeout(timeout);
   }, []);
 
