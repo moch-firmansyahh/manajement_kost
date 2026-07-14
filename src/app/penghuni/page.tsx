@@ -8,9 +8,10 @@ import { PenghuniTable } from "@/components/penghuni/PenghuniTable";
 import { PenghuniForm } from "@/components/penghuni/PenghuniForm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Search, AlertCircle } from "lucide-react";
+import { Plus, Search, AlertCircle, ArrowUpDown } from "lucide-react";
 import { Penghuni } from "@/types";
 import { cn } from "@/lib/utils";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // Halaman utama Manajemen Penghuni Kost
 export default function PenghuniPage() {
@@ -22,16 +23,23 @@ export default function PenghuniPage() {
   const [editingData, setEditingData] = useState<Penghuni | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<"aktif" | "alumni">("aktif");
+  const [urutanWaktu, setUrutanWaktu] = useState<"terbaru" | "terlama">("terbaru");
 
   const isLoading = loadingPenghuni || loadingKamar;
   const error = errorPenghuni || errorKamar;
 
-  // Filter data penghuni berdasarkan kolom pencarian dan tab aktif (Aktif/Alumni)
-  const filteredData = dataPenghuni.filter(p => {
-    const matchName = p.nama.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchStatus = activeTab === "aktif" ? !p.tanggalKeluar : !!p.tanggalKeluar;
-    return matchName && matchStatus;
-  });
+  // Filter dan urutkan data penghuni berdasarkan pencarian, tab aktif, dan urutan tanggal masuk
+  const filteredData = dataPenghuni
+    .filter(p => {
+      const matchName = p.nama.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchStatus = activeTab === "aktif" ? !p.tanggalKeluar : !!p.tanggalKeluar;
+      return matchName && matchStatus;
+    })
+    .sort((a, b) => {
+      const timeA = new Date(a.tanggalMasuk).getTime();
+      const timeB = new Date(b.tanggalMasuk).getTime();
+      return urutanWaktu === "terbaru" ? timeB - timeA : timeA - timeB;
+    });
 
   // Menangani aksi edit penghuni
   const handleEdit = (penghuni: Penghuni) => {
@@ -125,25 +133,44 @@ export default function PenghuniPage() {
         </Button>
       </div>
 
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        {/* Tab Filter Status Keaktifan */}
-        <div className="flex bg-muted p-1 rounded-lg">
-          <button 
-            onClick={() => setActiveTab("aktif")}
-            className={cn("px-4 py-1.5 text-sm font-medium rounded-md transition-all", activeTab === "aktif" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground")}
-          >
-            Aktif
-          </button>
-          <button 
-            onClick={() => setActiveTab("alumni")}
-            className={cn("px-4 py-1.5 text-sm font-medium rounded-md transition-all", activeTab === "alumni" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground")}
-          >
-            Penghuni yang Keluar
-          </button>
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full">
+          {/* Tab Filter Status Keaktifan */}
+          <div className="flex bg-muted p-1 rounded-lg w-fit">
+            <button 
+              onClick={() => setActiveTab("aktif")}
+              className={cn("px-4 py-1.5 text-sm font-medium rounded-md transition-all", activeTab === "aktif" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground")}
+            >
+              Aktif
+            </button>
+            <button 
+              onClick={() => setActiveTab("alumni")}
+              className={cn("px-4 py-1.5 text-sm font-medium rounded-md transition-all", activeTab === "alumni" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground")}
+            >
+              Penghuni yang Keluar
+            </button>
+          </div>
+
+          {/* Filter Urut Tanggal */}
+          <div className="flex items-center gap-2 w-full sm:max-w-[200px]">
+            <ArrowUpDown className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+            <Select 
+              value={urutanWaktu} 
+              onValueChange={(value) => setUrutanWaktu(value as "terbaru" | "terlama")}
+            >
+              <SelectTrigger className="bg-background border-border w-full">
+                <SelectValue placeholder="Urutkan Tanggal" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="terbaru">Terbaru ke Terlama</SelectItem>
+                <SelectItem value="terlama">Terlama ke Terbaru</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {/* Kolom Pencarian */}
-        <div className="flex items-center w-full sm:max-w-sm relative group">
+        <div className="flex items-center w-full lg:max-w-sm relative group">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
           <Input 
             placeholder="Cari nama penghuni..." 
@@ -158,8 +185,8 @@ export default function PenghuniPage() {
         data={filteredData} 
         dataKamar={dataKamar}
         onEdit={handleEdit} 
-        onDelete={handleHapus} 
         onCheckout={handleCheckout}
+        onDelete={handleHapus} 
       />
 
       <PenghuniForm

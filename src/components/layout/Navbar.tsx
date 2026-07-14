@@ -63,7 +63,7 @@ export const Navbar = ({ toggleSidebar }: NavbarProps) => {
           </Button>
         )}
         
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground outline-none ring-0 focus-visible:ring-0">
               <Bell className="h-5 w-5" />
