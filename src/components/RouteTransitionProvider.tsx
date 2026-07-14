@@ -2,13 +2,13 @@
 
 import React, { createContext, useContext, useState, useRef, useCallback } from "react";
 import { usePathname } from "next/navigation";
-import HouseLoader from "@/components/ui/HouseLoader";
+import { HouseLoader } from "@/components/ui/HouseLoader";
 import { WelcomeScreen } from "@/components/ui/WelcomeScreen";
 
-type TransitionContextType = {
+interface TransitionContextType {
   startTransition: () => void;
   stopTransition: () => void;
-};
+}
 
 const TransitionContext = createContext<TransitionContextType | undefined>(undefined);
 
@@ -26,46 +26,64 @@ export function RouteTransitionProvider({ children }: { children: React.ReactNod
   const [isVisible, setIsVisible] = useState(true);
   const [isInitialMount, setIsInitialMount] = useState(true);
   const fadeOutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
+  
+  // Melacak stempel waktu mulai transisi agar loading minimum 1.2 detik (menunggu rumah tergambar selesai)
+  const transitionStartRef = useRef<number>(Date.now());
   const pathname = usePathname();
 
-  // Menangani penayangan saat initial mount
+  // Menangani penayangan saat initial mount (Refresh / F5)
   React.useEffect(() => {
     const timeout = setTimeout(() => {
-      // Mulai fade out
+      // Mulai fade out setelah rumah selesai digambar (1.2 detik)
       setIsVisible(false);
       // Setelah animasi fade out selesai (300ms), benar-benar unmount
       setTimeout(() => {
         setIsTransitioning(false);
         setIsInitialMount(false);
       }, 300);
-    }, 400); // Dikurangi dari 1500ms menjadi 400ms agar instan & tidak lag
+    }, 1200);
     return () => clearTimeout(timeout);
   }, []);
 
   // Mematikan loading screen HANYA JIKA halaman benar-benar sudah selesai berpindah
   React.useEffect(() => {
     if (!isInitialMount) {
-      // Fade out dulu, lalu unmount
+      const elapsed = Date.now() - transitionStartRef.current;
+      const remaining = Math.max(0, 1200 - elapsed);
+
+      const timeout = setTimeout(() => {
+        // Mulai fade out
+        setIsVisible(false);
+        if (fadeOutTimerRef.current) clearTimeout(fadeOutTimerRef.current);
+        fadeOutTimerRef.current = setTimeout(() => {
+          setIsTransitioning(false);
+        }, 300);
+      }, remaining);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [pathname, isInitialMount]);
+
+  // Memulai loading screen secara manual saat link diklik
+  const startTransition = useCallback(() => {
+    if (fadeOutTimerRef.current) clearTimeout(fadeOutTimerRef.current);
+    transitionStartRef.current = Date.now(); // Catat waktu awal mulai transisi
+    setIsTransitioning(true);
+    setIsVisible(true);
+  }, []);
+
+  // Menghentikan loading screen (biasanya digunakan untuk refresh halaman yang sama)
+  const stopTransition = useCallback(() => {
+    const elapsed = Date.now() - transitionStartRef.current;
+    const remaining = Math.max(0, 1200 - elapsed);
+
+    setTimeout(() => {
       setIsVisible(false);
       if (fadeOutTimerRef.current) clearTimeout(fadeOutTimerRef.current);
       fadeOutTimerRef.current = setTimeout(() => {
         setIsTransitioning(false);
       }, 300);
-    }
-  }, [pathname, isInitialMount]);
-
-  const startTransition = useCallback(() => {
-    if (fadeOutTimerRef.current) clearTimeout(fadeOutTimerRef.current);
-    setIsTransitioning(true);
-    setIsVisible(true);
-  }, []);
-
-  const stopTransition = useCallback(() => {
-    setIsVisible(false);
-    fadeOutTimerRef.current = setTimeout(() => {
-      setIsTransitioning(false);
-    }, 300);
+    }, remaining);
   }, []);
 
   return (
