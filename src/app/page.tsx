@@ -170,7 +170,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             {tagihanBulanDepan.length > 0 ? (
-              <div className="max-h-[245px] overflow-y-auto pr-1">
+              <div className="max-h-[210px] overflow-y-auto pr-1">
                 <Table className="min-w-[400px]">
                   <TableHeader className="sticky top-0 bg-card z-10">
                     <TableRow>
@@ -182,7 +182,7 @@ export default function Dashboard() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {tagihanBulanDepan.slice(0, 5).map((bayar) => {
+                    {tagihanBulanDepan.map((bayar) => {
                       const penghuni = dataPenghuni.find(p => p.id === bayar.penghuniId);
                       const kamar = dataKamar.find(k => k.id === bayar.kamarId);
                       return (
