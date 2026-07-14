@@ -4215,7 +4215,7 @@
       "tahun": 2026,
       "jumlah": 1200000,
       "tanggalBayar": null,
-      "status": "belum_bayar",
+      "status": "terlambat",
       "createdAt": "2026-06-30T17:00:00.000Z"
     },
     {

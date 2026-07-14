@@ -182,7 +182,7 @@ export default function Dashboard() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {tagihanBulanDepan.map((bayar) => {
+                    {tagihanBulanDepan.slice(0, 5).map((bayar) => {
                       const penghuni = dataPenghuni.find(p => p.id === bayar.penghuniId);
                       const kamar = dataKamar.find(k => k.id === bayar.kamarId);
                       return (
