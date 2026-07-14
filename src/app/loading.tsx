@@ -1,10 +1,5 @@
-import { Loader2 } from "lucide-react";
+import HouseLoader from "@/components/ui/HouseLoader";
 
 export default function Loading() {
-  return (
-    <div className="flex flex-col items-center justify-center min-h-[400px] w-full space-y-4">
-      <Loader2 className="h-10 w-10 text-primary animate-spin" />
-      <p className="text-sm font-medium text-muted-foreground animate-pulse">Memuat data...</p>
-    </div>
-  );
+  return <HouseLoader />;
 }
