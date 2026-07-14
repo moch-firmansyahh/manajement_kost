@@ -21,8 +21,17 @@ export default function LoginPage() {
     const adminEmail = localStorage.getItem("adminEmail") || "admin@kost.com";
     const adminPassword = localStorage.getItem("adminPassword") || "admin";
 
-    if (email !== adminEmail || password !== adminPassword) {
-      toast.error("Email atau kata sandi salah.");
+    const isEmailWrong = email !== adminEmail;
+    const isPasswordWrong = password !== adminPassword;
+
+    if (isEmailWrong && isPasswordWrong) {
+      toast.error("Email dan Password salah.");
+      return;
+    } else if (isEmailWrong) {
+      toast.error("Email salah.");
+      return;
+    } else if (isPasswordWrong) {
+      toast.error("Password salah.");
       return;
     }
 

@@ -33,7 +33,16 @@ export default function RootLayout({
           <RouteTransitionProvider>
             <MainLayoutClient>{children}</MainLayoutClient>
           </RouteTransitionProvider>
-          <Toaster position="top-center" richColors />
+          <Toaster 
+            position="top-center" 
+            closeButton 
+            toastOptions={{
+              style: {
+                borderRadius: '12px',
+                padding: '12px 16px',
+              }
+            }}
+          />
         </ThemeProvider>
       </body>
     </html>
