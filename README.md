@@ -17,9 +17,8 @@
 - **Dashboard Statistik**: Memantau total kamar, kamar kosong atau terisi, serta akumulasi pendapatan sewa secara real-time.
 - **Manajemen Kamar (CRUD)**: Pendataan nomor kamar, lantai, tipe, harga per bulan, fasilitas kustom, dan status kesiapan kamar.
 - **Manajemen Penghuni (CRUD)**: Registrasi data NIK, nomor telepon, tanggal masuk, status keaktifan, dan riwayat kamar yang pernah disewa.
+- **Manajemen Pembayaran (CRUD)**: Pencatatan sewa bulanan, filter bulan/tahun, pembaruan status bayar, hapus tagihan, dan pencarian nama penyewa.
 - **Sistem Billing Pembayaran**: Auto-generation tagihan bulanan berjalan, pencatatan transaksi masuk, filter tahun/status bayar, serta pencarian instan nama penyewa.
-- **Route Transitions & HouseLoader**: Pengalaman animasi gambar garis rumah SVG premium saat awal masuk aplikasi, memuat dashboard, dan perpindahan rute inti.
-- **Lightweight Hooks Caching**: Optimasi kinerja frontend menggunakan module-level cache & event listeners pada hooks (`useKamar`, `usePenghuni`, `usePembayaran`) untuk mengeliminasi duplikasi request API dan lag secara total.
 
 ---
 
@@ -29,7 +28,6 @@
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 - **UI Library**: [ShadcnUI](https://ui.shadcn.com/)
-- **Data Store**: Local State & API Route Handlers (Persistensi file `db.json` dengan programmatic seeding data awal)
 
 ---
 
