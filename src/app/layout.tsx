@@ -12,6 +12,7 @@ export const metadata: Metadata = {
 };
 
 import { RouteTransitionProvider } from "@/components/RouteTransitionProvider";
+import { Toaster } from "sonner";
 
 export default function RootLayout({
   children,
@@ -32,6 +33,7 @@ export default function RootLayout({
           <RouteTransitionProvider>
             <MainLayoutClient>{children}</MainLayoutClient>
           </RouteTransitionProvider>
+          <Toaster position="top-center" richColors />
         </ThemeProvider>
       </body>
     </html>

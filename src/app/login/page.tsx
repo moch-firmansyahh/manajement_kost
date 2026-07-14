@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,17 +14,15 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
 
     const adminEmail = localStorage.getItem("adminEmail") || "admin@kost.com";
     const adminPassword = localStorage.getItem("adminPassword") || "admin";
 
     if (email !== adminEmail || password !== adminPassword) {
-      setError("Email atau kata sandi salah.");
+      toast.error("Email atau kata sandi salah.");
       return;
     }
 
@@ -87,12 +86,6 @@ export default function LoginPage() {
                   </button>
                 </div>
               </div>
-
-              {error && (
-                <div className="text-sm font-medium text-red-500 text-center">
-                  {error}
-                </div>
-              )}
 
               <Button 
                 type="submit" 
