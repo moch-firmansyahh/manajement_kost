@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { StatusBadge } from "./StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Eye, Edit, Trash2 } from "lucide-react";
-import { TransitionLink } from "@/components/ui/TransitionLink";
+import Link from "next/link";
 
 interface PembayaranTableProps {
   data: Pembayaran[];
@@ -23,8 +23,8 @@ export const PembayaranTable = ({ data, dataPenghuni, dataKamar, onEdit, onDelet
 
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden shadow-sm">
-      <Table className="min-w-[950px]">
-        <TableHeader className="bg-muted/50">
+      <Table className="min-w-[950px]" containerClassName="max-h-[488px]">
+        <TableHeader className="bg-muted">
           <TableRow>
             <TableHead>Penghuni</TableHead>
             <TableHead>Kamar</TableHead>
@@ -79,9 +79,9 @@ export const PembayaranTable = ({ data, dataPenghuni, dataKamar, onEdit, onDelet
                 </TableCell>
                 <TableCell className="text-right space-x-2">
                   <Button variant="ghost" size="icon" asChild className="text-primary hover:bg-primary/10 dark:hover:bg-primary/20">
-                    <TransitionLink href={`/pembayaran/${bayar.id}`}>
+                    <Link href={`/pembayaran/${bayar.id}`}>
                       <Eye className="h-4 w-4" />
-                    </TransitionLink>
+                    </Link>
                   </Button>
                   <Button variant="ghost" size="icon" onClick={() => onEdit(bayar)} className="text-amber-600 hover:text-amber-700 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-900/50">
                     <Edit className="h-4 w-4" />

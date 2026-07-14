@@ -56,7 +56,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
           const Icon = item.icon;
           
           return (
-            <TransitionLink
+            <Link
               key={item.name}
               href={item.href}
               onClick={() => {
@@ -77,7 +77,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                 )} 
               />
               {item.name}
-            </TransitionLink>
+            </Link>
           );
         })}
       </nav>

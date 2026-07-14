@@ -170,8 +170,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             {tagihanBulanDepan.length > 0 ? (
-              <div className="max-h-[210px] overflow-y-auto pr-1">
-                <Table className="min-w-[400px]">
+              <Table className="min-w-[400px]" containerClassName="max-h-[210px] pr-1">
                   <TableHeader className="sticky top-0 bg-card z-10">
                     <TableRow>
                       <TableHead>Penghuni</TableHead>
@@ -201,7 +200,6 @@ export default function Dashboard() {
                     })}
                   </TableBody>
                 </Table>
-              </div>
             ) : (
               <div className="text-center py-6 text-muted-foreground">Tidak ada tagihan bulan depan yang belum dibayar 🎉</div>
             )}

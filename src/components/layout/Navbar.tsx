@@ -110,9 +110,9 @@ export const Navbar = ({ toggleSidebar }: NavbarProps) => {
               <>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="w-full justify-center text-xs cursor-pointer text-muted-foreground" asChild>
-                  <TransitionLink href="/pembayaran">
+                  <Link href="/pembayaran">
                     Lihat Semua Tagihan
-                  </TransitionLink>
+                  </Link>
                 </DropdownMenuItem>
               </>
             )}

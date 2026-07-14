@@ -7,9 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
+import { useTransitionContext } from "@/components/RouteTransitionProvider";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { startTransition } = useTransitionContext();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -17,6 +19,20 @@ export default function LoginPage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const isEmailEmpty = !email.trim();
+    const isPasswordEmpty = !password.trim();
+
+    if (isEmailEmpty && isPasswordEmpty) {
+      toast.error("Email dan Password harus diisi.");
+      return;
+    } else if (isEmailEmpty) {
+      toast.error("Email harus diisi.");
+      return;
+    } else if (isPasswordEmpty) {
+      toast.error("Password harus diisi.");
+      return;
+    }
 
     const adminEmail = localStorage.getItem("adminEmail") || "admin@kost.com";
     const adminPassword = localStorage.getItem("adminPassword") || "admin";
@@ -36,10 +52,11 @@ export default function LoginPage() {
     }
 
     setIsLoading(true);
+    startTransition();
     setTimeout(() => {
       sessionStorage.setItem("isAuth", "true");
       router.push("/");
-    }, 800);
+    }, 1200);
   };
 
   return (
@@ -65,7 +82,6 @@ export default function LoginPage() {
                   id="email" 
                   type="email" 
                   placeholder="Enter your email address" 
-                  required 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="h-11 rounded-lg border-zinc-200 dark:border-border placeholder:text-zinc-400 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-300"
@@ -78,14 +94,13 @@ export default function LoginPage() {
                 </div>
                 <div className="relative">
                   <Input 
-                    id="password" 
-                    type={showPassword ? "text" : "password"} 
-                    placeholder="Enter your password" 
-                    required 
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="h-11 rounded-lg border-zinc-200 dark:border-border pr-10 placeholder:text-zinc-400 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-300"
-                  />
+                  id="password" 
+                  type={showPassword ? "text" : "password"} 
+                  placeholder="Enter your password" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="h-11 rounded-lg border-zinc-200 dark:border-border pr-10 placeholder:text-zinc-400 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-300"
+                />
                   <button 
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
