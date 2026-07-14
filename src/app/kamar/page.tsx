@@ -1,16 +1,15 @@
 "use client";
-
 import { useState } from "react";
 import { useKamar } from "@/hooks/useKamar";
 import { KamarTable } from "@/components/kamar/KamarTable";
 import { KamarForm } from "@/components/kamar/KamarForm";
 import { Button } from "@/components/ui/button";
-import { Plus, Filter } from "lucide-react";
+import { Plus, Filter, AlertCircle } from "lucide-react";
 import { Kamar, StatusKamar } from "@/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function KamarPage() {
-  const { dataKamar, addKamar, updateKamar, deleteKamar } = useKamar();
+  const { dataKamar, addKamar, updateKamar, deleteKamar, isLoading, error } = useKamar();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingData, setEditingData] = useState<Kamar | null>(null);
   const [filterStatus, setFilterStatus] = useState<StatusKamar | "semua">("semua");
@@ -36,6 +35,31 @@ export default function KamarPage() {
       addKamar(data);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6 animate-pulse">
+        <div className="flex justify-between items-center">
+          <div className="h-8 bg-muted rounded w-28"></div>
+          <div className="h-8 bg-muted rounded w-36"></div>
+        </div>
+        <div className="h-10 bg-muted rounded w-48"></div>
+        <div className="h-64 bg-muted rounded-xl"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[300px] space-y-4">
+        <AlertCircle className="h-12 w-12 text-destructive animate-bounce" />
+        <div className="text-center">
+          <h3 className="text-lg font-semibold text-destructive">Gagal Memuat Data Kamar</h3>
+          <p className="text-muted-foreground text-sm">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

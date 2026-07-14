@@ -5,18 +5,11 @@ import { usePathname, useRouter } from "next/navigation";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Navbar } from "@/components/layout/Navbar";
 import { cn } from "@/lib/utils";
-import { autoGenerateTagihan } from "@/hooks/usePembayaran";
-
 export const MainLayoutClient = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-
-  useEffect(() => {
-    // Jalankan sistem auto-billing (Generate tagihan otomatis) HANYA SEKALI SAAT APP DIMUAT
-    autoGenerateTagihan();
-  }, []);
 
   useEffect(() => {
     // Periksa status login

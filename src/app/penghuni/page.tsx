@@ -1,26 +1,28 @@
 "use client";
-
 import { useState } from "react";
 import { usePenghuni } from "@/hooks/usePenghuni";
 import { useKamar } from "@/hooks/useKamar";
-import { autoGenerateTagihan, usePembayaran } from "@/hooks/usePembayaran";
+import { usePembayaran } from "@/hooks/usePembayaran";
 import { PenghuniTable } from "@/components/penghuni/PenghuniTable";
 import { PenghuniForm } from "@/components/penghuni/PenghuniForm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, AlertCircle } from "lucide-react";
 import { Penghuni } from "@/types";
 import { cn } from "@/lib/utils";
 
 export default function PenghuniPage() {
-  const { dataPenghuni, addPenghuni, updatePenghuni, deletePenghuni } = usePenghuni();
-  const { dataKamar, updateKamar } = useKamar();
+  const { dataPenghuni, addPenghuni, updatePenghuni, deletePenghuni, isLoading: loadingPenghuni, error: errorPenghuni } = usePenghuni();
+  const { dataKamar, updateKamar, isLoading: loadingKamar, error: errorKamar } = useKamar();
   const { deletePembayaranByPenghuniId } = usePembayaran();
   
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingData, setEditingData] = useState<Penghuni | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<"aktif" | "alumni">("aktif");
+
+  const isLoading = loadingPenghuni || loadingKamar;
+  const error = errorPenghuni || errorKamar;
 
   const filteredData = dataPenghuni.filter(p => {
     const matchName = p.nama.toLowerCase().includes(searchQuery.toLowerCase());
@@ -63,11 +65,6 @@ export default function PenghuniPage() {
       addPenghuni(data);
       // Sinkronisasi: otomatis ubah kamar menjadi terisi
       updateKamar(data.kamarId, { status: "terisi" });
-      
-      // Trigger update tagihan agar tagihan penghuni baru langsung muncul
-      setTimeout(() => {
-        autoGenerateTagihan();
-      }, 0);
     }
   };
 
@@ -79,6 +76,31 @@ export default function PenghuniPage() {
     deletePenghuni(id);
     deletePembayaranByPenghuniId(id); // Cascade delete tagihan
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6 animate-pulse">
+        <div className="flex justify-between items-center">
+          <div className="h-8 bg-muted rounded w-28"></div>
+          <div className="h-8 bg-muted rounded w-36"></div>
+        </div>
+        <div className="h-10 bg-muted rounded w-48"></div>
+        <div className="h-64 bg-muted rounded-xl"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[300px] space-y-4">
+        <AlertCircle className="h-12 w-12 text-destructive animate-bounce" />
+        <div className="text-center">
+          <h3 className="text-lg font-semibold text-destructive">Gagal Memuat Data Penghuni</h3>
+          <p className="text-muted-foreground text-sm">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

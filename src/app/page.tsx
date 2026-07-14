@@ -11,9 +11,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 
 export default function Dashboard() {
-  const { dataKamar } = useKamar();
-  const { dataPenghuni } = usePenghuni();
-  const { dataPembayaran } = usePembayaran();
+  const { dataKamar, isLoading: loadingKamar, error: errorKamar } = useKamar();
+  const { dataPenghuni, isLoading: loadingPenghuni, error: errorPenghuni } = usePenghuni();
+  const { dataPembayaran, isLoading: loadingPembayaran, error: errorPembayaran } = usePembayaran();
+
+  const isLoading = loadingKamar || loadingPenghuni || loadingPembayaran;
+  const error = errorKamar || errorPenghuni || errorPembayaran;
 
   const totalKamar = dataKamar.length;
   const kamarTerisi = dataKamar.filter(k => k.status === "terisi").length;
@@ -41,6 +44,38 @@ export default function Dashboard() {
     .filter(p => new Date(p.tanggalMasuk) >= oneMonthAgo)
     .sort((a, b) => new Date(b.tanggalMasuk).getTime() - new Date(a.tanggalMasuk).getTime())
     .slice(0, 5);
+
+  if (isLoading) {
+    return (
+      <div className="space-y-8 animate-pulse">
+        <div>
+          <div className="h-8 bg-muted rounded w-36 mb-2"></div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-28 bg-muted rounded-xl"></div>
+          ))}
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {[...Array(2)].map((_, i) => (
+            <div key={i} className="h-80 bg-muted rounded-xl"></div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+        <AlertCircle className="h-12 w-12 text-destructive animate-bounce" />
+        <div className="text-center">
+          <h3 className="text-lg font-semibold text-destructive">Gagal Memuat Dashboard</h3>
+          <p className="text-muted-foreground text-sm">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">

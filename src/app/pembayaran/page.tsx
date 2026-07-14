@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import { usePembayaran } from "@/hooks/usePembayaran";
 import { usePenghuni } from "@/hooks/usePenghuni";
@@ -7,14 +6,14 @@ import { useKamar } from "@/hooks/useKamar";
 import { PembayaranTable } from "@/components/pembayaran/PembayaranTable";
 import { PembayaranForm } from "@/components/pembayaran/PembayaranForm";
 import { Button } from "@/components/ui/button";
-import { Plus, Filter, Calendar } from "lucide-react";
+import { Plus, Filter, Calendar, AlertCircle } from "lucide-react";
 import { Pembayaran, StatusPembayaran } from "@/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function PembayaranPage() {
-  const { dataPembayaran, addPembayaran, updatePembayaran, deletePembayaran } = usePembayaran();
-  const { dataPenghuni } = usePenghuni();
-  const { dataKamar } = useKamar();
+  const { dataPembayaran, addPembayaran, updatePembayaran, deletePembayaran, isLoading: loadingPembayaran, error: errorPembayaran } = usePembayaran();
+  const { dataPenghuni, isLoading: loadingPenghuni, error: errorPenghuni } = usePenghuni();
+  const { dataKamar, isLoading: loadingKamar, error: errorKamar } = useKamar();
   
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingData, setEditingData] = useState<Pembayaran | null>(null);
@@ -22,6 +21,9 @@ export default function PembayaranPage() {
   
   const currentYear = new Date().getFullYear().toString();
   const [filterTahun, setFilterTahun] = useState<string>(currentYear);
+
+  const isLoading = loadingPembayaran || loadingPenghuni || loadingKamar;
+  const error = errorPembayaran || errorPenghuni || errorKamar;
 
   // Generate list of available years from data, plus current year
   const availableYears = Array.from(
@@ -60,6 +62,34 @@ export default function PembayaranPage() {
       addPembayaran(data);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6 animate-pulse">
+        <div className="flex justify-between items-center">
+          <div className="h-8 bg-muted rounded w-28"></div>
+          <div className="h-8 bg-muted rounded w-36"></div>
+        </div>
+        <div className="flex gap-4">
+          <div className="h-10 bg-muted rounded w-48"></div>
+          <div className="h-10 bg-muted rounded w-48"></div>
+        </div>
+        <div className="h-64 bg-muted rounded-xl"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[300px] space-y-4">
+        <AlertCircle className="h-12 w-12 text-destructive animate-bounce" />
+        <div className="text-center">
+          <h3 className="text-lg font-semibold text-destructive">Gagal Memuat Data Pembayaran</h3>
+          <p className="text-muted-foreground text-sm">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
