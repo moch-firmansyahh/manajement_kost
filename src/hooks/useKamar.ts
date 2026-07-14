@@ -1,12 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Kamar } from '@/types';
 
+// Custom hook untuk operasi CRUD Kamar Kost
 export const useKamar = () => {
   const [dataKamar, setDataKamar] = useState<Kamar[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchKamar = useCallback(async () => {
+  // Fungsi untuk mengambil data kamar dari API
+  const ambilKamar = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
@@ -24,12 +26,14 @@ export const useKamar = () => {
   }, []);
 
   useEffect(() => {
-    fetchKamar();
-  }, [fetchKamar]);
+    ambilKamar();
+  }, [ambilKamar]);
 
-  const getKamarById = (id: string) => dataKamar.find(k => k.id === id);
+  // Mencari data kamar sesuai ID
+  const ambilKamarSesuaiId = (id: string) => dataKamar.find(k => k.id === id);
 
-  const addKamar = async (kamar: Omit<Kamar, 'id' | 'createdAt'>) => {
+  // Menambah data kamar baru
+  const tambahKamar = async (kamar: Omit<Kamar, 'id' | 'createdAt'>) => {
     try {
       const response = await fetch('/api/kamar', {
         method: 'POST',
@@ -39,13 +43,14 @@ export const useKamar = () => {
       if (!response.ok) {
         throw new Error('Gagal menambah kamar');
       }
-      await fetchKamar();
+      await ambilKamar();
     } catch (err) {
       console.error(err);
     }
   };
 
-  const updateKamar = async (id: string, updatedData: Partial<Kamar>) => {
+  // Memperbarui data kamar berdasarkan ID
+  const perbaruiKamar = async (id: string, updatedData: Partial<Kamar>) => {
     try {
       const response = await fetch(`/api/kamar/${id}`, {
         method: 'PUT',
@@ -55,13 +60,14 @@ export const useKamar = () => {
       if (!response.ok) {
         throw new Error('Gagal memperbarui kamar');
       }
-      await fetchKamar();
+      await ambilKamar();
     } catch (err) {
       console.error(err);
     }
   };
 
-  const deleteKamar = async (id: string) => {
+  // Menghapus data kamar berdasarkan ID
+  const hapusKamar = async (id: string) => {
     try {
       const response = await fetch(`/api/kamar/${id}`, {
         method: 'DELETE',
@@ -69,7 +75,7 @@ export const useKamar = () => {
       if (!response.ok) {
         throw new Error('Gagal menghapus kamar');
       }
-      await fetchKamar();
+      await ambilKamar();
     } catch (err) {
       console.error(err);
     }
@@ -79,10 +85,10 @@ export const useKamar = () => {
     dataKamar,
     isLoading,
     error,
-    getKamarById,
-    addKamar,
-    updateKamar,
-    deleteKamar,
-    refresh: fetchKamar,
+    ambilKamarSesuaiId,
+    tambahKamar,
+    perbaruiKamar,
+    hapusKamar,
+    refresh: ambilKamar,
   };
 };

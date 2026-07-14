@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import { useKamar } from "@/hooks/useKamar";
 import { KamarTable } from "@/components/kamar/KamarTable";
@@ -8,31 +9,36 @@ import { Plus, Filter, AlertCircle } from "lucide-react";
 import { Kamar, StatusKamar } from "@/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+// Halaman utama Daftar Kamar Kost
 export default function KamarPage() {
-  const { dataKamar, addKamar, updateKamar, deleteKamar, isLoading, error } = useKamar();
+  const { dataKamar, tambahKamar, perbaruiKamar, hapusKamar, isLoading, error } = useKamar();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingData, setEditingData] = useState<Kamar | null>(null);
   const [filterStatus, setFilterStatus] = useState<StatusKamar | "semua">("semua");
 
+  // Filter data kamar sesuai status yang dipilih
   const filteredData = filterStatus === "semua" 
     ? dataKamar 
     : dataKamar.filter(k => k.status === filterStatus);
 
+  // Menangani aksi edit kamar
   const handleEdit = (kamar: Kamar) => {
     setEditingData(kamar);
     setIsFormOpen(true);
   };
 
-  const handleCloseForm = () => {
+  // Menutup dialog formulir tambah/edit kamar
+  const handleTutupForm = () => {
     setIsFormOpen(false);
     setEditingData(null);
   };
 
-  const handleSubmit = (data: Omit<Kamar, "id" | "createdAt">) => {
+  // Menangani pengiriman data formulir (tambah/edit)
+  const handleKirim = (data: Omit<Kamar, "id" | "createdAt">) => {
     if (editingData) {
-      updateKamar(editingData.id, data);
+      perbaruiKamar(editingData.id, data);
     } else {
-      addKamar(data);
+      tambahKamar(data);
     }
   };
 
@@ -97,13 +103,13 @@ export default function KamarPage() {
       <KamarTable 
         data={filteredData} 
         onEdit={handleEdit} 
-        onDelete={deleteKamar} 
+        onDelete={hapusKamar} 
       />
 
       <KamarForm
         isOpen={isFormOpen}
-        onClose={handleCloseForm}
-        onSubmit={handleSubmit}
+        onClose={handleTutupForm}
+        onSubmit={handleKirim}
         initialData={editingData}
       />
     </div>

@@ -1,19 +1,21 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Pembayaran } from '@/types';
 
+// Custom hook untuk operasi CRUD Pembayaran Sewa Kost
 export const usePembayaran = () => {
   const [dataPembayaran, setDataPembayaran] = useState<Pembayaran[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchPembayaran = useCallback(async () => {
+  // Mengambil data seluruh tagihan pembayaran dari API
+  const ambilPembayaran = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      // 1. Trigger auto-generation on server
+      // 1. Jalankan sinkronisasi / pembuatan tagihan otomatis di server
       await fetch('/api/pembayaran/generate', { method: 'POST' });
       
-      // 2. Fetch the updated payments list
+      // 2. Ambil data tagihan terupdate
       const response = await fetch('/api/pembayaran');
       if (!response.ok) {
         throw new Error('Gagal mengambil data pembayaran');
@@ -28,12 +30,14 @@ export const usePembayaran = () => {
   }, []);
 
   useEffect(() => {
-    fetchPembayaran();
-  }, [fetchPembayaran]);
+    ambilPembayaran();
+  }, [ambilPembayaran]);
 
-  const getPembayaranById = (id: string) => dataPembayaran.find(p => p.id === id);
+  // Mencari data pembayaran berdasarkan ID
+  const ambilPembayaranSesuaiId = (id: string) => dataPembayaran.find(p => p.id === id);
 
-  const addPembayaran = async (pembayaran: Omit<Pembayaran, 'id' | 'createdAt'>) => {
+  // Menambah catatan pembayaran baru
+  const tambahPembayaran = async (pembayaran: Omit<Pembayaran, 'id' | 'createdAt'>) => {
     try {
       const response = await fetch('/api/pembayaran', {
         method: 'POST',
@@ -43,13 +47,14 @@ export const usePembayaran = () => {
       if (!response.ok) {
         throw new Error('Gagal menambah data pembayaran');
       }
-      await fetchPembayaran();
+      await ambilPembayaran();
     } catch (err) {
       console.error(err);
     }
   };
 
-  const updatePembayaran = async (id: string, updatedData: Partial<Pembayaran>) => {
+  // Memperbarui catatan pembayaran berdasarkan ID
+  const perbaruiPembayaran = async (id: string, updatedData: Partial<Pembayaran>) => {
     try {
       const response = await fetch(`/api/pembayaran/${id}`, {
         method: 'PUT',
@@ -59,13 +64,14 @@ export const usePembayaran = () => {
       if (!response.ok) {
         throw new Error('Gagal memperbarui data pembayaran');
       }
-      await fetchPembayaran();
+      await ambilPembayaran();
     } catch (err) {
       console.error(err);
     }
   };
 
-  const deletePembayaran = async (id: string) => {
+  // Menghapus catatan pembayaran berdasarkan ID
+  const hapusPembayaran = async (id: string) => {
     try {
       const response = await fetch(`/api/pembayaran/${id}`, {
         method: 'DELETE',
@@ -73,19 +79,18 @@ export const usePembayaran = () => {
       if (!response.ok) {
         throw new Error('Gagal menghapus data pembayaran');
       }
-      await fetchPembayaran();
+      await ambilPembayaran();
     } catch (err) {
       console.error(err);
     }
   };
 
-  const deletePembayaranByPenghuniId = async (penghuniId: string) => {
-    // This is handled automatically by cascade delete on the server side when deleting a tenant,
-    // but we can also trigger individual deletes if needed.
+  // Menghapus catatan pembayaran berdasarkan ID Penghuni
+  const hapusPembayaranSesuaiIdPenghuni = async (penghuniId: string) => {
     try {
       const related = dataPembayaran.filter(p => p.penghuniId === penghuniId);
       await Promise.all(related.map(p => fetch(`/api/pembayaran/${p.id}`, { method: 'DELETE' })));
-      await fetchPembayaran();
+      await ambilPembayaran();
     } catch (err) {
       console.error(err);
     }
@@ -95,11 +100,11 @@ export const usePembayaran = () => {
     dataPembayaran,
     isLoading,
     error,
-    getPembayaranById,
-    addPembayaran,
-    updatePembayaran,
-    deletePembayaran,
-    deletePembayaranByPenghuniId,
-    refresh: fetchPembayaran,
+    ambilPembayaranSesuaiId,
+    tambahPembayaran,
+    perbaruiPembayaran,
+    hapusPembayaran,
+    hapusPembayaranSesuaiIdPenghuni,
+    refresh: ambilPembayaran,
   };
 };

@@ -24,16 +24,17 @@ const NAMA_BULAN = [
   "Juli", "Agustus", "September", "Oktober", "November", "Desember"
 ];
 
-function generateDefaultDb(): DbSchema {
+// Membuat database default berisi data sewa kamar kost
+function buatDbDefault(): DbSchema {
   const kamar: Kamar[] = [];
   const penghuni: Penghuni[] = [];
   const pembayaran: Pembayaran[] = [];
 
-  // 1. Generate 30 Rooms
-  // Floors 1 to 3, 10 rooms per floor: 101-110, 201-210, 301-310
+  // 1. Bangkitkan 30 Kamar
+  // Lantai 1 s/d 3, masing-masing lantai berisi 10 kamar: 101-110, 201-210, 301-310
   for (let floor = 1; floor <= 3; floor++) {
     for (let num = 1; num <= 10; num++) {
-      const id = `${floor}${num.toString().padStart(2, '0')}`; // e.g. "101", "210"
+      const id = `${floor}${num.toString().padStart(2, '0')}`; // Contoh: "101", "210"
       const nomorKamar = `${floor}${num.toString().padStart(2, '0')}`;
       
       let tipe = "Standard";
@@ -50,10 +51,10 @@ function generateDefaultDb(): DbSchema {
         fasilitas = ["Kasur", "Lemari", "AC", "WiFi", "Kamar Mandi Dalam"];
       }
 
-      // Initial status distribution:
-      // First 25 rooms will be set to 'terisi' as we assign active tenants to them.
-      // Room index 25-27 (rooms 306, 307, 308) -> 'tersedia'
-      // Room index 28-29 (rooms 309, 310) -> 'maintenance'
+      // Distribusi status awal kamar:
+      // 25 kamar pertama diatur ke status 'terisi' karena kita akan mengaitkan penghuni aktif ke kamar tersebut.
+      // Indeks kamar 25-27 (kamar 306, 307, 308) -> 'tersedia'
+      // Indeks kamar 28-29 (kamar 309, 310) -> 'maintenance'
       let status: StatusKamar = "terisi";
       const index = (floor - 1) * 10 + (num - 1);
       if (index === 25 || index === 26 || index === 27) {
@@ -75,10 +76,10 @@ function generateDefaultDb(): DbSchema {
     }
   }
 
-  // 2. Generate 30 Tenants
-  // We have 30 Indonesian names.
-  // The first 25 tenants are active (tanggalKeluar: null) and occupy rooms index 0-24.
-  // The last 5 tenants (index 25-29) are checked out (tanggalKeluar set) and we map their kamarId to a room.
+  // 2. Bangkitkan 30 Penghuni
+  // Kita memiliki 30 nama Indonesia.
+  // 25 penghuni pertama berstatus aktif (tanggalKeluar: null) dan menempati kamar indeks 0 s/d 24.
+  // 5 penghuni terakhir (indeks 25 s/d 29) berstatus keluar (tanggalKeluar diisi) dan dikaitkan ke salah satu kamar.
   const entryDates = [
     "2024-01-15T00:00:00.000Z", "2024-02-10T00:00:00.000Z", "2024-03-05T00:00:00.000Z",
     "2024-04-20T00:00:00.000Z", "2024-05-15T00:00:00.000Z", "2024-06-12T00:00:00.000Z",
@@ -99,18 +100,18 @@ function generateDefaultDb(): DbSchema {
     const noTelepon = `0812345678${(i + 1).toString().padStart(2, '0')}`;
     const email = `${nama.toLowerCase().replace(/\s+/g, '.')}@example.com`;
     
-    // Assign rooms:
-    // First 25 tenants get occupied rooms (index i)
-    // Last 5 checked-out tenants get a room (e.g. they stayed in rooms 1-5 previously)
+    // Alokasi kamar:
+    // 25 penghuni pertama menempati kamar aktif (indeks i)
+    // 5 penghuni terakhir yang sudah keluar dipetakan ke kamar semula (misalnya kamar 1 s/d 5)
     const kamarId = i < 25 ? kamar[i].id : kamar[i - 25].id;
     
     const tanggalMasuk = entryDates[i];
     let tanggalKeluar: string | null = null;
     
-    // Checked out tenants (index 25 to 29)
+    // Penghuni yang berstatus keluar (indeks 25 s/d 29)
     if (i >= 25) {
       const checkin = new Date(tanggalMasuk);
-      // Stayed for exactly 6 months
+      // Tinggal selama 6 bulan lalu keluar
       const checkout = new Date(checkin.getFullYear(), checkin.getMonth() + 6, checkin.getDate());
       tanggalKeluar = checkout.toISOString();
     }
@@ -128,11 +129,11 @@ function generateDefaultDb(): DbSchema {
     });
   }
 
-  // 3. Generate Historical Payments
-  // For each tenant, generate monthly payments from 1 month after their entry date
-  // up to July 2026 (or current date/future). Let's target up to July 2026.
+  // 3. Bangkitkan Riwayat Pembayaran Historis
+  // Untuk setiap penghuni, buat catatan tagihan bulanan mulai dari 1 bulan setelah tanggal masuk
+  // hingga Juli 2026 (target akhir simulasi).
   const targetEndYear = 2026;
-  const targetEndMonth = 6; // July (0-indexed)
+  const targetEndMonth = 6; // Juli (0-indexed)
 
   penghuni.forEach(p => {
     const assignedRoom = kamar.find(k => k.id === p.kamarId);
@@ -141,19 +142,19 @@ function generateDefaultDb(): DbSchema {
     const masukDate = new Date(p.tanggalMasuk);
     const checkoutDate = p.tanggalKeluar ? new Date(p.tanggalKeluar) : null;
     
-    // Start generating bills starting 1 month after entry date
+    // Mulai bangkitkan tagihan bulanan semenjak 1 bulan setelah masuk kost
     let currDate = new Date(masukDate.getFullYear(), masukDate.getMonth() + 1, 1);
     
     while (true) {
       const currYear = currDate.getFullYear();
       const currMonthIdx = currDate.getMonth();
 
-      // Stop if we exceed the target date
+      // Berhenti jika sudah melampaui tanggal target akhir
       if (currYear > targetEndYear || (currYear === targetEndYear && currMonthIdx > targetEndMonth)) {
         break;
       }
 
-      // Stop if the billing date is after they checked out
+      // Berhenti jika tanggal tagihan adalah setelah penghuni tersebut keluar/checkout
       if (checkoutDate && currDate > checkoutDate) {
         break;
       }
@@ -162,15 +163,15 @@ function generateDefaultDb(): DbSchema {
       const tahun = currYear;
       const jumlah = assignedRoom.hargaPerBulan;
       
-      // Determine status:
-      // For bills before June 2026 (historical):
-      // - 85% chance 'lunas' (paid)
-      // - 10% chance 'belum_bayar' (unpaid)
-      // - 5% chance 'terlambat' (late)
-      // For bills in June/July 2026 (recent):
-      // - 50% 'lunas', 50% 'belum_bayar'
+      // Penentuan status bayar secara acak untuk variasi data:
+      // Untuk tagihan sebelum Juni 2026 (historis):
+      // - 85% lunas dengan tanggal bayar acak
+      // - 10% belum_bayar
+      // - 5% terlambat
+      // Untuk tagihan Juni/Juli 2026 (terbaru):
+      // - 50% lunas, 50% belum_bayar
       let status: StatusPembayaran = "lunas";
-      const isRecent = currYear === 2026 && currMonthIdx >= 5; // Juni or Juli 2026
+      const isRecent = currYear === 2026 && currMonthIdx >= 5;
       
       if (isRecent) {
         status = Math.random() > 0.5 ? "lunas" : "belum_bayar";
@@ -187,7 +188,7 @@ function generateDefaultDb(): DbSchema {
 
       let tanggalBayar: string | null = null;
       if (status === "lunas") {
-        // Paid between 1st and 10th of that month
+        // Dibayar antara tanggal 1 s/d 10 di bulan tersebut
         const payDay = Math.floor(Math.random() * 10) + 1;
         const payDate = new Date(currYear, currMonthIdx, payDay);
         tanggalBayar = payDate.toISOString();
@@ -212,25 +213,27 @@ function generateDefaultDb(): DbSchema {
   return { kamar, penghuni, pembayaran };
 }
 
-export const readDb = (): DbSchema => {
+// Membaca database lokal dari file JSON
+export const bacaDb = (): DbSchema => {
   try {
     if (!fs.existsSync(dbPath)) {
-      const initialDb = generateDefaultDb();
+      const initialDb = buatDbDefault();
       fs.writeFileSync(dbPath, JSON.stringify(initialDb, null, 2), 'utf8');
       return initialDb;
     }
     const raw = fs.readFileSync(dbPath, 'utf8');
     return JSON.parse(raw);
   } catch (e) {
-    console.error("Error reading database file", e);
+    console.error("Kesalahan membaca file database", e);
     return { kamar: [], penghuni: [], pembayaran: [] };
   }
 };
 
-export const writeDb = (data: DbSchema) => {
+// Menulis pembaruan data ke database lokal (file JSON)
+export const tulisDb = (data: DbSchema) => {
   try {
     fs.writeFileSync(dbPath, JSON.stringify(data, null, 2), 'utf8');
   } catch (e) {
-    console.error("Error writing database file", e);
+    console.error("Kesalahan menulis file database", e);
   }
 };

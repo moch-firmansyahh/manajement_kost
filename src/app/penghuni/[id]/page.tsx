@@ -17,11 +17,11 @@ export default function PenghuniDetailPage({ params }: { params: Promise<{ id: s
   const resolvedParams = use(params);
   const id = resolvedParams.id;
   
-  const { getPenghuniById } = usePenghuni();
-  const { getKamarById } = useKamar();
+  const { ambilPenghuniSesuaiId } = usePenghuni();
+  const { ambilKamarSesuaiId } = useKamar();
   const { dataPembayaran } = usePembayaran();
 
-  const penghuni = getPenghuniById(id);
+  const penghuni = ambilPenghuniSesuaiId(id);
   
   const currentYear = new Date().getFullYear().toString();
   const [filterTahun, setFilterTahun] = useState<string>(currentYear);
@@ -37,7 +37,7 @@ export default function PenghuniDetailPage({ params }: { params: Promise<{ id: s
     );
   }
 
-  const kamar = getKamarById(penghuni.kamarId);
+  const kamar = ambilKamarSesuaiId(penghuni.kamarId);
   const allRiwayat = dataPembayaran.filter(p => p.penghuniId === id);
   
   const availableYears = Array.from(

@@ -1,12 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Penghuni } from '@/types';
 
+// Custom hook untuk operasi CRUD Penghuni Kost
 export const usePenghuni = () => {
   const [dataPenghuni, setDataPenghuni] = useState<Penghuni[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchPenghuni = useCallback(async () => {
+  // Mengambil data seluruh penghuni dari API
+  const ambilPenghuni = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
@@ -24,12 +26,14 @@ export const usePenghuni = () => {
   }, []);
 
   useEffect(() => {
-    fetchPenghuni();
-  }, [fetchPenghuni]);
+    ambilPenghuni();
+  }, [ambilPenghuni]);
 
-  const getPenghuniById = (id: string) => dataPenghuni.find(p => p.id === id);
+  // Mencari data penghuni berdasarkan ID
+  const ambilPenghuniSesuaiId = (id: string) => dataPenghuni.find(p => p.id === id);
 
-  const addPenghuni = async (penghuni: Omit<Penghuni, 'id' | 'createdAt'>) => {
+  // Menambah data penghuni baru
+  const tambahPenghuni = async (penghuni: Omit<Penghuni, 'id' | 'createdAt'>) => {
     try {
       const response = await fetch('/api/penghuni', {
         method: 'POST',
@@ -39,13 +43,14 @@ export const usePenghuni = () => {
       if (!response.ok) {
         throw new Error('Gagal menambah penghuni');
       }
-      await fetchPenghuni();
+      await ambilPenghuni();
     } catch (err) {
       console.error(err);
     }
   };
 
-  const updatePenghuni = async (id: string, updatedData: Partial<Penghuni>) => {
+  // Memperbarui data penghuni berdasarkan ID
+  const perbaruiPenghuni = async (id: string, updatedData: Partial<Penghuni>) => {
     try {
       const response = await fetch(`/api/penghuni/${id}`, {
         method: 'PUT',
@@ -55,13 +60,14 @@ export const usePenghuni = () => {
       if (!response.ok) {
         throw new Error('Gagal memperbarui penghuni');
       }
-      await fetchPenghuni();
+      await ambilPenghuni();
     } catch (err) {
       console.error(err);
     }
   };
 
-  const deletePenghuni = async (id: string) => {
+  // Menghapus data penghuni berdasarkan ID
+  const hapusPenghuni = async (id: string) => {
     try {
       const response = await fetch(`/api/penghuni/${id}`, {
         method: 'DELETE',
@@ -69,7 +75,7 @@ export const usePenghuni = () => {
       if (!response.ok) {
         throw new Error('Gagal menghapus penghuni');
       }
-      await fetchPenghuni();
+      await ambilPenghuni();
     } catch (err) {
       console.error(err);
     }
@@ -79,10 +85,10 @@ export const usePenghuni = () => {
     dataPenghuni,
     isLoading,
     error,
-    getPenghuniById,
-    addPenghuni,
-    updatePenghuni,
-    deletePenghuni,
-    refresh: fetchPenghuni,
+    ambilPenghuniSesuaiId,
+    tambahPenghuni,
+    perbaruiPenghuni,
+    hapusPenghuni,
+    refresh: ambilPenghuni,
   };
 };

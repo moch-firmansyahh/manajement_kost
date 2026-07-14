@@ -1,28 +1,29 @@
 import { NextResponse } from 'next/server';
-import { readDb, writeDb } from '@/lib/db';
+import { bacaDb, tulisDb } from '@/lib/db';
 import { Pembayaran } from '@/types';
 
+// Membuat/memperbarui tagihan bulanan otomatis untuk penghuni aktif
 export async function POST() {
   try {
-    const db = readDb();
+    const db = bacaDb();
     const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
     const now = new Date();
     
     let isModified = false;
     
     db.penghuni.forEach(penghuni => {
-      if (penghuni.tanggalKeluar) return; // Skip inactive tenants
+      if (penghuni.tanggalKeluar) return; // Lewati penghuni yang sudah keluar/tidak aktif
       
       const kamar = db.kamar.find(k => k.id === penghuni.kamarId);
       if (!kamar) return;
       
       const masukDate = new Date(penghuni.tanggalMasuk);
-      const dueDay = masukDate.getDate(); // Jatuh tempo = tanggal masuk
+      const dueDay = masukDate.getDate(); // Jatuh tempo pembayaran = tanggal masuk kost
       
-      // Mulai tagihan otomatis 1 bulan setelah tanggal masuk
+      // Mulai pembuatan tagihan otomatis 1 bulan setelah tanggal masuk
       let currDate = new Date(masukDate.getFullYear(), masukDate.getMonth() + 1, 1);
       
-      // Target = bulan depan (supaya tagihan bulan depan sudah muncul)
+      // Target tagihan adalah sampai bulan depan
       const targetDate = new Date(now.getFullYear(), now.getMonth() + 1, 1);
       
       while (currDate <= targetDate) {
@@ -33,7 +34,7 @@ export async function POST() {
         let bill = db.pembayaran.find(p => p.penghuniId === penghuni.id && p.bulan === bulan && p.tahun === tahun);
         
         if (!bill) {
-          // Create missing bill automatically
+          // Buat tagihan baru yang belum tercatat
           bill = {
             id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
             penghuniId: penghuni.id,
@@ -49,10 +50,9 @@ export async function POST() {
           isModified = true;
         }
         
-        // Cek apakah status perlu diubah menjadi 'terlambat'
+        // Periksa apakah status tagihan perlu diubah menjadi 'terlambat' (jatuh tempo terlewati)
         if (bill.status === "belum_bayar" || bill.status === "terlambat") {
           const dueDate = new Date(tahun, bulanIndex, dueDay);
-          // Toleransi waktu
           dueDate.setHours(23, 59, 59, 999);
           
           if (now > dueDate && bill.status !== "terlambat") {
@@ -69,11 +69,11 @@ export async function POST() {
     });
 
     if (isModified) {
-      writeDb(db);
+      tulisDb(db);
     }
     
     return NextResponse.json(db.pembayaran);
   } catch (error) {
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ message: 'Kesalahan Server Internal' }, { status: 500 });
   }
 }

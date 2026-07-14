@@ -1,23 +1,25 @@
 import { NextResponse } from 'next/server';
-import { readDb, writeDb } from '@/lib/db';
+import { bacaDb, tulisDb } from '@/lib/db';
 
+// Mengambil data penghuni berdasarkan ID
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    const db = readDb();
+    const db = bacaDb();
     const penghuni = db.penghuni.find(p => p.id === id);
     if (!penghuni) {
-      return NextResponse.json({ message: 'Tenant not found' }, { status: 404 });
+      return NextResponse.json({ message: 'Penghuni tidak ditemukan' }, { status: 404 });
     }
     return NextResponse.json(penghuni);
   } catch (error) {
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ message: 'Kesalahan Server Internal' }, { status: 500 });
   }
 }
 
+// Memperbarui data penghuni berdasarkan ID
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -25,11 +27,11 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
-    const db = readDb();
+    const db = bacaDb();
     
     const index = db.penghuni.findIndex(p => p.id === id);
     if (index === -1) {
-      return NextResponse.json({ message: 'Tenant not found' }, { status: 404 });
+      return NextResponse.json({ message: 'Penghuni tidak ditemukan' }, { status: 404 });
     }
     
     const oldKamarId = db.penghuni[index].kamarId;
@@ -37,15 +39,15 @@ export async function PUT(
     const newKamarId = db.penghuni[index].kamarId;
     const isCheckedOut = db.penghuni[index].tanggalKeluar !== null;
     
-    // Update room status depending on check-in or checkout
+    // Perbarui status kamar tergantung pada proses check-in atau checkout
     if (isCheckedOut) {
-      // Set the room as available
+      // Kosongkan kamar
       const kIndex = db.kamar.findIndex(k => k.id === newKamarId);
       if (kIndex !== -1) {
         db.kamar[kIndex].status = 'tersedia';
       }
     } else if (oldKamarId !== newKamarId) {
-      // Room changed: make old room available and new room occupied
+      // Kamar berubah: kosongkan kamar lama dan isi kamar baru
       const oldKIndex = db.kamar.findIndex(k => k.id === oldKamarId);
       if (oldKIndex !== -1) {
         db.kamar[oldKIndex].status = 'tersedia';
@@ -56,43 +58,44 @@ export async function PUT(
       }
     }
     
-    writeDb(db);
+    tulisDb(db);
     return NextResponse.json(db.penghuni[index]);
   } catch (error) {
-    return NextResponse.json({ message: 'Bad Request' }, { status: 400 });
+    return NextResponse.json({ message: 'Permintaan Tidak Valid' }, { status: 400 });
   }
 }
 
+// Hapus data penghuni beserta riwayat pembayarannya berdasarkan ID
 export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    const db = readDb();
+    const db = bacaDb();
     
     const index = db.penghuni.findIndex(p => p.id === id);
     if (index === -1) {
-      return NextResponse.json({ message: 'Tenant not found' }, { status: 404 });
+      return NextResponse.json({ message: 'Penghuni tidak ditemukan' }, { status: 404 });
     }
     
     const kamarId = db.penghuni[index].kamarId;
     
-    // Delete tenant
+    // Hapus penghuni
     db.penghuni = db.penghuni.filter(p => p.id !== id);
     
-    // Cascade delete payments
+    // Hapus pembayaran (cascade delete)
     db.pembayaran = db.pembayaran.filter(p => p.penghuniId !== id);
     
-    // Free the room
+    // Kosongkan kamar
     const kIndex = db.kamar.findIndex(k => k.id === kamarId);
     if (kIndex !== -1) {
       db.kamar[kIndex].status = 'tersedia';
     }
     
-    writeDb(db);
-    return NextResponse.json({ message: 'Tenant and payments deleted successfully' });
+    tulisDb(db);
+    return NextResponse.json({ message: 'Penghuni dan riwayat pembayaran berhasil dihapus' });
   } catch (error) {
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ message: 'Kesalahan Server Internal' }, { status: 500 });
   }
 }

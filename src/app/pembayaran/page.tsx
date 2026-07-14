@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import { usePembayaran } from "@/hooks/usePembayaran";
 import { usePenghuni } from "@/hooks/usePenghuni";
@@ -10,8 +11,9 @@ import { Plus, Filter, Calendar, AlertCircle } from "lucide-react";
 import { Pembayaran, StatusPembayaran } from "@/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+// Halaman utama Manajemen Pembayaran Kost
 export default function PembayaranPage() {
-  const { dataPembayaran, addPembayaran, updatePembayaran, deletePembayaran, isLoading: loadingPembayaran, error: errorPembayaran } = usePembayaran();
+  const { dataPembayaran, tambahPembayaran, perbaruiPembayaran, hapusPembayaran, isLoading: loadingPembayaran, error: errorPembayaran } = usePembayaran();
   const { dataPenghuni, isLoading: loadingPenghuni, error: errorPenghuni } = usePenghuni();
   const { dataKamar, isLoading: loadingKamar, error: errorKamar } = useKamar();
   
@@ -25,11 +27,12 @@ export default function PembayaranPage() {
   const isLoading = loadingPembayaran || loadingPenghuni || loadingKamar;
   const error = errorPembayaran || errorPenghuni || errorKamar;
 
-  // Generate list of available years from data, plus current year
+  // Membuat daftar pilihan tahun pembayaran dari data yang ada
   const availableYears = Array.from(
     new Set([currentYear, ...dataPembayaran.map(p => p.tahun.toString())])
   ).sort((a, b) => parseInt(b) - parseInt(a));
 
+  // Melakukan filter data pembayaran bulanan
   const filteredData = dataPembayaran.filter(p => {
     // 1. Sembunyikan riwayat pembayaran penghuni yang sudah keluar
     const penghuni = dataPenghuni.find(pengh => pengh.id === p.penghuniId);
@@ -39,27 +42,30 @@ export default function PembayaranPage() {
     // 2. Filter berdasarkan Tahun agar tidak terlalu panjang/melebar
     if (filterTahun !== "semua" && p.tahun.toString() !== filterTahun) return false;
 
-    // 3. Filter berdasarkan Status
+    // 3. Filter berdasarkan Status Pembayaran
     if (filterStatus !== "semua" && p.status !== filterStatus) return false;
 
     return true;
   });
 
+  // Menangani aksi edit pembayaran
   const handleEdit = (pembayaran: Pembayaran) => {
     setEditingData(pembayaran);
     setIsFormOpen(true);
   };
 
-  const handleCloseForm = () => {
+  // Menutup dialog formulir tambah/edit pembayaran
+  const handleTutupForm = () => {
     setIsFormOpen(false);
     setEditingData(null);
   };
 
-  const handleSubmit = (data: Omit<Pembayaran, "id" | "createdAt">) => {
+  // Menangani pengiriman data formulir (tambah/edit)
+  const handleKirim = (data: Omit<Pembayaran, "id" | "createdAt">) => {
     if (editingData) {
-      updatePembayaran(editingData.id, data);
+      perbaruiPembayaran(editingData.id, data);
     } else {
-      addPembayaran(data);
+      tambahPembayaran(data);
     }
   };
 
@@ -107,6 +113,7 @@ export default function PembayaranPage() {
       </div>
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        {/* Filter Status Bayar */}
         <div className="flex items-center gap-2 w-full sm:max-w-[200px]">
           <Filter className="h-4 w-4 text-muted-foreground flex-shrink-0" />
           <Select 
@@ -125,6 +132,7 @@ export default function PembayaranPage() {
           </Select>
         </div>
 
+        {/* Filter Tahun */}
         <div className="flex items-center gap-2 w-full sm:max-w-[200px]">
           <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
           <Select 
@@ -149,13 +157,13 @@ export default function PembayaranPage() {
         dataPenghuni={dataPenghuni}
         dataKamar={dataKamar}
         onEdit={handleEdit} 
-        onDelete={deletePembayaran} 
+        onDelete={hapusPembayaran} 
       />
 
       <PembayaranForm
         isOpen={isFormOpen}
-        onClose={handleCloseForm}
-        onSubmit={handleSubmit}
+        onClose={handleTutupForm}
+        onSubmit={handleKirim}
         initialData={editingData}
         dataPenghuni={dataPenghuni}
         dataKamar={dataKamar}

@@ -15,11 +15,11 @@ export default function PembayaranDetailPage({ params }: { params: Promise<{ id:
   const resolvedParams = use(params);
   const id = resolvedParams.id;
   
-  const { getPembayaranById } = usePembayaran();
-  const { getPenghuniById } = usePenghuni();
-  const { getKamarById } = useKamar();
+  const { ambilPembayaranSesuaiId } = usePembayaran();
+  const { ambilPenghuniSesuaiId } = usePenghuni();
+  const { ambilKamarSesuaiId } = useKamar();
 
-  const pembayaran = getPembayaranById(id);
+  const pembayaran = ambilPembayaranSesuaiId(id);
   
   if (!pembayaran) {
     return (
@@ -32,8 +32,8 @@ export default function PembayaranDetailPage({ params }: { params: Promise<{ id:
     );
   }
 
-  const penghuni = getPenghuniById(pembayaran.penghuniId);
-  const kamar = getKamarById(pembayaran.kamarId);
+  const penghuni = ambilPenghuniSesuaiId(pembayaran.penghuniId);
+  const kamar = ambilKamarSesuaiId(pembayaran.kamarId);
 
   return (
     <div className="space-y-6">

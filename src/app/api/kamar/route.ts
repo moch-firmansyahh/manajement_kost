@@ -1,20 +1,22 @@
 import { NextResponse } from 'next/server';
-import { readDb, writeDb } from '@/lib/db';
+import { bacaDb, tulisDb } from '@/lib/db';
 import { Kamar } from '@/types';
 
+// Mengambil seluruh data kamar
 export async function GET() {
   try {
-    const db = readDb();
+    const db = bacaDb();
     return NextResponse.json(db.kamar);
   } catch (error) {
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ message: 'Kesalahan Server Internal' }, { status: 500 });
   }
 }
 
+// Menambahkan data kamar baru
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const db = readDb();
+    const db = bacaDb();
     
     const newKamar: Kamar = {
       ...body,
@@ -23,10 +25,10 @@ export async function POST(request: Request) {
     };
     
     db.kamar.push(newKamar);
-    writeDb(db);
+    tulisDb(db);
     
     return NextResponse.json(newKamar, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ message: 'Bad Request' }, { status: 400 });
+    return NextResponse.json({ message: 'Permintaan Tidak Valid' }, { status: 400 });
   }
 }

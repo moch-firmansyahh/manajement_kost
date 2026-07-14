@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import { usePenghuni } from "@/hooks/usePenghuni";
 import { useKamar } from "@/hooks/useKamar";
@@ -11,10 +12,11 @@ import { Plus, Search, AlertCircle } from "lucide-react";
 import { Penghuni } from "@/types";
 import { cn } from "@/lib/utils";
 
+// Halaman utama Manajemen Penghuni Kost
 export default function PenghuniPage() {
-  const { dataPenghuni, addPenghuni, updatePenghuni, deletePenghuni, isLoading: loadingPenghuni, error: errorPenghuni } = usePenghuni();
-  const { dataKamar, updateKamar, isLoading: loadingKamar, error: errorKamar } = useKamar();
-  const { deletePembayaranByPenghuniId } = usePembayaran();
+  const { dataPenghuni, tambahPenghuni, perbaruiPenghuni, hapusPenghuni, isLoading: loadingPenghuni, error: errorPenghuni } = usePenghuni();
+  const { dataKamar, perbaruiKamar, isLoading: loadingKamar, error: errorKamar } = useKamar();
+  const { hapusPembayaranSesuaiIdPenghuni } = usePembayaran();
   
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingData, setEditingData] = useState<Penghuni | null>(null);
@@ -24,57 +26,63 @@ export default function PenghuniPage() {
   const isLoading = loadingPenghuni || loadingKamar;
   const error = errorPenghuni || errorKamar;
 
+  // Filter data penghuni berdasarkan kolom pencarian dan tab aktif (Aktif/Alumni)
   const filteredData = dataPenghuni.filter(p => {
     const matchName = p.nama.toLowerCase().includes(searchQuery.toLowerCase());
     const matchStatus = activeTab === "aktif" ? !p.tanggalKeluar : !!p.tanggalKeluar;
     return matchName && matchStatus;
   });
 
+  // Menangani aksi edit penghuni
   const handleEdit = (penghuni: Penghuni) => {
     setEditingData(penghuni);
     setIsFormOpen(true);
   };
 
-  const handleCloseForm = () => {
+  // Menutup dialog formulir tambah/edit penghuni
+  const handleTutupForm = () => {
     setIsFormOpen(false);
     setEditingData(null);
   };
 
+  // Menangani proses checkout penghuni (keluar dari kost)
   const handleCheckout = (id: string) => {
     const penghuni = dataPenghuni.find(p => p.id === id);
     if (penghuni && !penghuni.tanggalKeluar) {
-      updatePenghuni(id, { tanggalKeluar: new Date().toISOString() });
-      updateKamar(penghuni.kamarId, { status: "tersedia" });
+      perbaruiPenghuni(id, { tanggalKeluar: new Date().toISOString() });
+      perbaruiKamar(penghuni.kamarId, { status: "tersedia" });
     }
   };
 
-  const handleSubmit = (data: Omit<Penghuni, "id" | "createdAt">) => {
+  // Menangani pengiriman data formulir tambah/edit penghuni
+  const handleKirim = (data: Omit<Penghuni, "id" | "createdAt">) => {
     if (editingData) {
-      updatePenghuni(editingData.id, data);
-      // Jika kamar berubah, ubah kamar lama jadi tersedia, kamar baru jadi terisi
+      perbaruiPenghuni(editingData.id, data);
+      // Jika kamar berubah, ubah status kamar lama jadi tersedia, kamar baru jadi terisi
       if (editingData.kamarId !== data.kamarId) {
-        updateKamar(editingData.kamarId, { status: "tersedia" });
-        updateKamar(data.kamarId, { status: "terisi" });
+        perbaruiKamar(editingData.kamarId, { status: "tersedia" });
+        perbaruiKamar(data.kamarId, { status: "terisi" });
       } else if (data.tanggalKeluar) {
         // Jika diatur tanggal keluar, kamarnya jadi tersedia
-        updateKamar(data.kamarId, { status: "tersedia" });
+        perbaruiKamar(data.kamarId, { status: "tersedia" });
       } else {
-        updateKamar(data.kamarId, { status: "terisi" });
+        perbaruiKamar(data.kamarId, { status: "terisi" });
       }
     } else {
-      addPenghuni(data);
-      // Sinkronisasi: otomatis ubah kamar menjadi terisi
-      updateKamar(data.kamarId, { status: "terisi" });
+      tambahPenghuni(data);
+      // Otomatis ubah status kamar menjadi terisi
+      perbaruiKamar(data.kamarId, { status: "terisi" });
     }
   };
 
-  const handleDelete = (id: string) => {
+  // Menangani penghapusan data penghuni beserta riwayat pembayarannya
+  const handleHapus = (id: string) => {
     const penghuni = dataPenghuni.find(p => p.id === id);
     if (penghuni) {
-      updateKamar(penghuni.kamarId, { status: "tersedia" });
+      perbaruiKamar(penghuni.kamarId, { status: "tersedia" });
     }
-    deletePenghuni(id);
-    deletePembayaranByPenghuniId(id); // Cascade delete tagihan
+    hapusPenghuni(id);
+    hapusPembayaranSesuaiIdPenghuni(id); // Hapus otomatis tagihan yang berelasi
   };
 
   if (isLoading) {
@@ -118,7 +126,7 @@ export default function PenghuniPage() {
       </div>
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        {/* Tabs Filter */}
+        {/* Tab Filter Status Keaktifan */}
         <div className="flex bg-muted p-1 rounded-lg">
           <button 
             onClick={() => setActiveTab("aktif")}
@@ -134,7 +142,7 @@ export default function PenghuniPage() {
           </button>
         </div>
 
-        {/* Search */}
+        {/* Kolom Pencarian */}
         <div className="flex items-center w-full sm:max-w-sm relative group">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
           <Input 
@@ -150,14 +158,14 @@ export default function PenghuniPage() {
         data={filteredData} 
         dataKamar={dataKamar}
         onEdit={handleEdit} 
-        onDelete={handleDelete} 
+        onDelete={handleHapus} 
         onCheckout={handleCheckout}
       />
 
       <PenghuniForm
         isOpen={isFormOpen}
-        onClose={handleCloseForm}
-        onSubmit={handleSubmit}
+        onClose={handleTutupForm}
+        onSubmit={handleKirim}
         initialData={editingData}
         dataKamar={dataKamar}
       />

@@ -17,11 +17,11 @@ export default function KamarDetailPage({ params }: { params: Promise<{ id: stri
   const resolvedParams = use(params);
   const id = resolvedParams.id;
   
-  const { getKamarById } = useKamar();
+  const { ambilKamarSesuaiId } = useKamar();
   const { dataPenghuni } = usePenghuni();
   const { dataPembayaran } = usePembayaran();
 
-  const kamar = getKamarById(id);
+  const kamar = ambilKamarSesuaiId(id);
   
   if (!kamar) {
     return (
