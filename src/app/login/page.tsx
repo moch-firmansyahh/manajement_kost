@@ -19,8 +19,11 @@ export default function LoginPage() {
     e.preventDefault();
     setError(null);
 
-    if (email !== "firmanajah366@gmail.com") {
-      setError("Email belum terdaftar. Gunakan firmanajah366@gmail.com");
+    const adminEmail = localStorage.getItem("adminEmail") || "admin@kost.com";
+    const adminPassword = localStorage.getItem("adminPassword") || "admin";
+
+    if (email !== adminEmail || password !== adminPassword) {
+      setError("Email atau kata sandi salah.");
       return;
     }
 

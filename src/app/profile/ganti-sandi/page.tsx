@@ -44,6 +44,12 @@ export default function GantiSandiPage() {
       return;
     }
 
+    const adminPassword = localStorage.getItem("adminPassword") || "admin";
+    if (currentPassword !== adminPassword) {
+      setError("Kata sandi saat ini salah.");
+      return;
+    }
+
     if (!isValidPassword) {
       setError("Kata sandi baru tidak memenuhi kriteria keamanan.");
       return;
@@ -56,9 +62,10 @@ export default function GantiSandiPage() {
 
     setIsLoading(true);
 
-    // Simulate network request and hashing
+    // Simpan kata sandi baru secara lokal ke localStorage
     setTimeout(() => {
       setIsLoading(false);
+      localStorage.setItem("adminPassword", newPassword);
       router.push("/profile");
     }, 1500);
   };

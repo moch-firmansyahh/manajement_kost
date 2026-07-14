@@ -8,6 +8,13 @@
 
 ---
 
+### 🔑 Kredensial Akses Login (Frontend Demo)
+* **Email**: `admin@kost.com`
+* **Password**: `admin`
+*(Dapat diperbarui secara dinamis dari menu Profil di dalam aplikasi)*
+
+---
+
 ## 🧑‍💻 Author
 
 **Moch Firmansyah** - *103012400137* - IF-48-08 - Telkom University
