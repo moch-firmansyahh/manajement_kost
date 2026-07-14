@@ -3,14 +3,18 @@
 
   # Manajemen Kost - Kontrakan Pa Iman
 
-  Aplikasi web berbasis Next.js untuk pengelola/pemilik kost dalam memantau kamar, data penghuni, serta pencatatan tagihan sewa bulanan secara digital dan terintegrasi.
+  Aplikasi web berbasis Next.js untuk pengelola/pemilik kost dalam memantau kamar, data penghuni, serta pencatatan tagihan sewa bulanan secara digital.
 </div>
 
 ---
 
+## 🧑‍💻 Author
+
+**Moch Firmansyah** - *103012400137* - IF-48-08 - Telkom University
+
 ## 🚀 Fitur Utama
 
-- **Dashboard Statistik**: Memantau total kamar, kamar kosong vs terisi, serta akumulasi pendapatan sewa secara real-time.
+- **Dashboard Statistik**: Memantau total kamar, kamar kosong atau terisi, serta akumulasi pendapatan sewa secara real-time.
 - **Manajemen Kamar (CRUD)**: Pendataan nomor kamar, lantai, tipe, harga per bulan, fasilitas kustom, dan status kesiapan kamar.
 - **Manajemen Penghuni (CRUD)**: Registrasi data NIK, nomor telepon, tanggal masuk, status keaktifan, dan riwayat kamar yang pernah disewa.
 - **Sistem Billing Pembayaran**: Auto-generation tagihan bulanan berjalan, pencatatan transaksi masuk, filter tahun/status bayar, serta pencarian instan nama penyewa.
@@ -87,24 +91,4 @@ manajemen-kost/
    ```bash
    npm run dev
    ```
-
-5. **Buka di browser**:
-   Akses [http://localhost:3000](http://localhost:3000)
-
 ---
-
-## 📊 Kriteria Penilaian CCI
-
-| Komponen Evaluasi | Detail Implementasi & Kustomisasi |
-| ----------------- | -------------------------------- |
-| **TailwindCSS & Responsive** | Antarmuka adaptif penuh dengan breakpoint `sm`, `md`, `lg`. |
-| **Component & Hooks** | Struktur kode modular dengan caching listeners agar terbebas dari lag. |
-| **Routing & App Router** | Halaman dinamis dengan struktur `[id]` dan transisi rute khusus. |
-| **Data Fetching API** | Penggunaan Fetch API asinkron pada hooks ke Route Handlers internal. |
-| **Conditional Rendering** | Pembedaan status kamar, indikator badge bayar, dan loading screen. |
-
----
-
-## 🧑‍💻 Author
-
-**Moch Firmansyah** - *103012400137* - IF-48-08 - Telkom University
