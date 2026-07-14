@@ -30,56 +30,77 @@ function buatDbDefault(): DbSchema {
   const penghuni: Penghuni[] = [];
   const pembayaran: Pembayaran[] = [];
 
-  // 1. Bangkitkan 30 Kamar
-  // Lantai 1 s/d 3, masing-masing lantai berisi 10 kamar: 101-110, 201-210, 301-310
-  for (let floor = 1; floor <= 3; floor++) {
-    for (let num = 1; num <= 10; num++) {
-      const id = `${floor}${num.toString().padStart(2, '0')}`; // Contoh: "101", "210"
-      const nomorKamar = `${floor}${num.toString().padStart(2, '0')}`;
-      
-      let tipe = "Standard";
-      let hargaPerBulan = 800000;
-      let fasilitas = ["Kasur", "Lemari", "Kipas Angin", "Kamar Mandi Luar"];
+  // 1. Bangkitkan 40 Kamar
+  // Lantai 1 (Bawah): 1B s/d 20B
+  // Lantai 2 (Atas): 1A s/d 20A
+  
+  // Lantai 1 (Bawah)
+  for (let num = 1; num <= 20; num++) {
+    const id = `${num}B`;
+    const nomorKamar = `${num}B`;
+    
+    // 1B - 10B: Standard, 11B - 20B: Deluxe
+    const tipe = num <= 10 ? "Standard" : "Deluxe";
+    const hargaPerBulan = num <= 10 ? 800000 : 1200000;
+    const fasilitas = num <= 10 
+      ? ["Kasur", "Lemari", "Kipas Angin", "Kamar Mandi Luar"]
+      : ["Kasur", "Lemari", "AC", "WiFi", "Kamar Mandi Dalam"];
 
-      if (floor === 3) {
-        tipe = "VIP";
-        hargaPerBulan = 1500000;
-        fasilitas = ["Kasur Springbed", "Lemari", "AC", "WiFi", "TV", "Kamar Mandi Dalam", "Water Heater"];
-      } else if (num > 5) {
-        tipe = "Deluxe";
-        hargaPerBulan = 1200000;
-        fasilitas = ["Kasur", "Lemari", "AC", "WiFi", "Kamar Mandi Dalam"];
-      }
-
-      // Distribusi status awal kamar:
-      // 25 kamar pertama diatur ke status 'terisi' karena kita akan mengaitkan penghuni aktif ke kamar tersebut.
-      // Indeks kamar 25-27 (kamar 306, 307, 308) -> 'tersedia'
-      // Indeks kamar 28-29 (kamar 309, 310) -> 'maintenance'
-      let status: StatusKamar = "terisi";
-      const index = (floor - 1) * 10 + (num - 1);
-      if (index === 25 || index === 26 || index === 27) {
-        status = "tersedia";
-      } else if (index === 28 || index === 29) {
-        status = "maintenance";
-      }
-
-      kamar.push({
-        id,
-        nomorKamar,
-        lantai: floor,
-        tipe,
-        hargaPerBulan,
-        fasilitas,
-        status,
-        createdAt: "2024-01-01T00:00:00.000Z",
-      });
+    // 1B - 15B: Terisi, 16B - 18B: Tersedia, 19B - 20B: Maintenance
+    let status: StatusKamar = "terisi";
+    if (num >= 16 && num <= 18) {
+      status = "tersedia";
+    } else if (num >= 19) {
+      status = "maintenance";
     }
+
+    kamar.push({
+      id,
+      nomorKamar,
+      lantai: 1,
+      tipe,
+      hargaPerBulan,
+      fasilitas,
+      status,
+      createdAt: "2024-01-01T00:00:00.000Z",
+    });
+  }
+
+  // Lantai 2 (Atas)
+  for (let num = 1; num <= 20; num++) {
+    const id = `${num}A`;
+    const nomorKamar = `${num}A`;
+    
+    // 1A - 10A: Deluxe, 11A - 20A: VIP
+    const tipe = num <= 10 ? "Deluxe" : "VIP";
+    const hargaPerBulan = num <= 10 ? 1200000 : 1500000;
+    const fasilitas = num <= 10
+      ? ["Kasur", "Lemari", "AC", "WiFi", "Kamar Mandi Dalam"]
+      : ["Kasur Springbed", "Lemari", "AC", "WiFi", "TV", "Kamar Mandi Dalam", "Water Heater"];
+
+    // 1A - 15A: Terisi, 16A - 18A: Tersedia, 19A - 20A: Maintenance
+    let status: StatusKamar = "terisi";
+    if (num >= 16 && num <= 18) {
+      status = "tersedia";
+    } else if (num >= 19) {
+      status = "maintenance";
+    }
+
+    kamar.push({
+      id,
+      nomorKamar,
+      lantai: 2,
+      tipe,
+      hargaPerBulan,
+      fasilitas,
+      status,
+      createdAt: "2024-01-01T00:00:00.000Z",
+    });
   }
 
   // 2. Bangkitkan 30 Penghuni
-  // Kita memiliki 30 nama Indonesia.
-  // 25 penghuni pertama berstatus aktif (tanggalKeluar: null) dan menempati kamar indeks 0 s/d 24.
-  // 5 penghuni terakhir (indeks 25 s/d 29) berstatus keluar (tanggalKeluar diisi) dan dikaitkan ke salah satu kamar.
+  // 15 penghuni pertama di Lantai 1 (1B s/d 15B)
+  // 15 penghuni berikutnya di Lantai 2 (1A s/d 15A)
   const entryDates = [
     "2024-01-15T00:00:00.000Z", "2024-02-10T00:00:00.000Z", "2024-03-05T00:00:00.000Z",
     "2024-04-20T00:00:00.000Z", "2024-05-15T00:00:00.000Z", "2024-06-12T00:00:00.000Z",
@@ -101,14 +122,14 @@ function buatDbDefault(): DbSchema {
     const email = `${nama.toLowerCase().replace(/\s+/g, '.')}@example.com`;
     
     // Alokasi kamar:
-    // 25 penghuni pertama menempati kamar aktif (indeks i)
-    // 5 penghuni terakhir yang sudah keluar dipetakan ke kamar semula (misalnya kamar 1 s/d 5)
-    const kamarId = i < 25 ? kamar[i].id : kamar[i - 25].id;
+    // Indeks 0 s/d 14 -> Kamar 1B s/d 15B
+    // Indeks 15 s/d 29 -> Kamar 1A s/d 15A
+    const kamarId = i < 15 ? `${i + 1}B` : `${i - 14}A`;
     
     const tanggalMasuk = entryDates[i];
     let tanggalKeluar: string | null = null;
     
-    // Penghuni yang berstatus keluar (indeks 25 s/d 29)
+    // Penghuni yang berstatus keluar/alumni (indeks 25 s/d 29)
     if (i >= 25) {
       const checkin = new Date(tanggalMasuk);
       // Tinggal selama 6 bulan lalu keluar
@@ -164,12 +185,6 @@ function buatDbDefault(): DbSchema {
       const jumlah = assignedRoom.hargaPerBulan;
       
       // Penentuan status bayar secara acak untuk variasi data:
-      // Untuk tagihan sebelum Juni 2026 (historis):
-      // - 85% lunas dengan tanggal bayar acak
-      // - 10% belum_bayar
-      // - 5% terlambat
-      // Untuk tagihan Juni/Juli 2026 (terbaru):
-      // - 50% lunas, 50% belum_bayar
       let status: StatusPembayaran = "lunas";
       const isRecent = currYear === 2026 && currMonthIdx >= 5;
       

@@ -7,7 +7,8 @@ import { useKamar } from "@/hooks/useKamar";
 import { PembayaranTable } from "@/components/pembayaran/PembayaranTable";
 import { PembayaranForm } from "@/components/pembayaran/PembayaranForm";
 import { Button } from "@/components/ui/button";
-import { Plus, Filter, Calendar, AlertCircle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Plus, Filter, Calendar, AlertCircle, Search } from "lucide-react";
 import { Pembayaran, StatusPembayaran } from "@/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -20,6 +21,7 @@ export default function PembayaranPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingData, setEditingData] = useState<Pembayaran | null>(null);
   const [filterStatus, setFilterStatus] = useState<StatusPembayaran | "semua">("semua");
+  const [searchQuery, setSearchQuery] = useState("");
   
   const currentYear = new Date().getFullYear().toString();
   const [filterTahun, setFilterTahun] = useState<string>(currentYear);
@@ -32,17 +34,25 @@ export default function PembayaranPage() {
     new Set([currentYear, ...dataPembayaran.map(p => p.tahun.toString())])
   ).sort((a, b) => parseInt(b) - parseInt(a));
 
-  // Melakukan filter data pembayaran bulanan
+  // Melakukan filter data pembayaran bulanan berdasarkan pencarian, tahun, dan status
   const filteredData = dataPembayaran.filter(p => {
-    // 1. Sembunyikan riwayat pembayaran penghuni yang sudah keluar
+    // 1. Dapatkan data penghuni terkait
     const penghuni = dataPenghuni.find(pengh => pengh.id === p.penghuniId);
+    
+    // 2. Sembunyikan riwayat pembayaran penghuni yang sudah keluar
     const isAktif = penghuni && !penghuni.tanggalKeluar;
     if (!isAktif) return false;
+
+    // 3. Filter berdasarkan Kolom Pencarian Nama Penghuni
+    if (searchQuery.trim() !== "") {
+      const namaCocok = penghuni.nama.toLowerCase().includes(searchQuery.toLowerCase());
+      if (!namaCocok) return false;
+    }
     
-    // 2. Filter berdasarkan Tahun agar tidak terlalu panjang/melebar
+    // 4. Filter berdasarkan Tahun agar tidak terlalu panjang/melebar
     if (filterTahun !== "semua" && p.tahun.toString() !== filterTahun) return false;
 
-    // 3. Filter berdasarkan Status Pembayaran
+    // 5. Filter berdasarkan Status Pembayaran
     if (filterStatus !== "semua" && p.status !== filterStatus) return false;
 
     return true;
@@ -112,43 +122,56 @@ export default function PembayaranPage() {
         </Button>
       </div>
 
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-        {/* Filter Status Bayar */}
-        <div className="flex items-center gap-2 w-full sm:max-w-[200px]">
-          <Filter className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-          <Select 
-            value={filterStatus} 
-            onValueChange={(value) => setFilterStatus(value as StatusPembayaran | "semua")}
-          >
-            <SelectTrigger className="bg-background border-border w-full">
-              <SelectValue placeholder="Filter Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="semua">Semua Status</SelectItem>
-              <SelectItem value="lunas">Lunas</SelectItem>
-              <SelectItem value="belum_bayar">Belum Bayar</SelectItem>
-              <SelectItem value="terlambat">Terlambat</SelectItem>
-            </SelectContent>
-          </Select>
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full">
+          {/* Filter Status Bayar */}
+          <div className="flex items-center gap-2 w-full sm:max-w-[200px]">
+            <Filter className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+            <Select 
+              value={filterStatus} 
+              onValueChange={(value) => setFilterStatus(value as StatusPembayaran | "semua")}
+            >
+              <SelectTrigger className="bg-background border-border w-full">
+                <SelectValue placeholder="Filter Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="semua">Semua Status</SelectItem>
+                <SelectItem value="lunas">Lunas</SelectItem>
+                <SelectItem value="belum_bayar">Belum Bayar</SelectItem>
+                <SelectItem value="terlambat">Terlambat</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Filter Tahun */}
+          <div className="flex items-center gap-2 w-full sm:max-w-[200px]">
+            <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+            <Select 
+              value={filterTahun} 
+              onValueChange={setFilterTahun}
+            >
+              <SelectTrigger className="bg-background border-border w-full">
+                <SelectValue placeholder="Filter Tahun" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="semua">Semua Tahun</SelectItem>
+                {availableYears.map(year => (
+                  <SelectItem key={year} value={year}>Tahun {year}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
-        {/* Filter Tahun */}
-        <div className="flex items-center gap-2 w-full sm:max-w-[200px]">
-          <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-          <Select 
-            value={filterTahun} 
-            onValueChange={setFilterTahun}
-          >
-            <SelectTrigger className="bg-background border-border w-full">
-              <SelectValue placeholder="Filter Tahun" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="semua">Semua Tahun</SelectItem>
-              {availableYears.map(year => (
-                <SelectItem key={year} value={year}>Tahun {year}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        {/* Kolom Pencarian Nama Penghuni */}
+        <div className="flex items-center w-full lg:max-w-sm relative group">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+          <Input 
+            placeholder="Cari nama penghuni..." 
+            className="pl-10 bg-background border-border focus-visible:ring-primary w-full"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
       </div>
 
