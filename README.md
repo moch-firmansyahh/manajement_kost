@@ -1,22 +1,25 @@
 <div align="center">
   <img src="public/Logo-Kost.png" alt="Logo Kontrakan Pa Iman" width="280" />
 
-  # Manajemen Kost - Kontrakan Pa Iman
+# Manajemen Kost - Kontrakan Pa Iman
 
-  Aplikasi web berbasis Next.js untuk pengelola/pemilik kost dalam memantau kamar, data penghuni, serta pencatatan tagihan sewa bulanan secara digital.
+Aplikasi web berbasis Next.js untuk pengelola/pemilik kost dalam memantau kamar, data penghuni, serta pencatatan tagihan sewa bulanan secara digital.
+
 </div>
 
 ---
+
 ## 🧑‍💻 Author
 
-**Moch Firmansyah** - *103012400137* - IF-48-08 - Telkom University
+**Moch Firmansyah** - _103012400137_ - IF-48-08 - Telkom University
 
 ---
 
-### 🔑 Akses Login (Demo) 
-* **Email**: `admin@kost.com`
-* **Password**: `admin`
-*(Password dapat diperbarui diprofile)*
+### 🔑 Akses Login (Demo)
+
+- **Email**: `admin@kost.com`
+- **Password**: `admin`
+  _(Password dapat diperbarui diprofile)_
 
 ---
 
@@ -32,9 +35,9 @@
 
 ## 🛠️ Tech Stack
 
-- **Framework**: [Next.js 15 (App Router)](https://nextjs.org/)
+- **Framework**: [Next.js 16 (App Router)](https://nextjs.org/)
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
 - **UI Library**: [ShadcnUI](https://ui.shadcn.com/)
 
 ---
@@ -73,22 +76,26 @@ manajemen-kost/
 ## ⚡ Cara Menjalankan
 
 ### Prasyarat (Prerequisites)
+
 - Node.js versi 18 ke atas
 - npm atau yarn
 
 ### Instalasi & Menjalankan Local Server
 
 1. **Clone repository ini**:
+
    ```bash
    git clone https://github.com/moch-firmansyahh/manajement_kost.git
    ```
 
 2. **Masuk ke direktori proyek**:
+
    ```bash
    cd manajement_kost
    ```
 
 3. **Install dependencies**:
+
    ```bash
    npm install
    ```
@@ -97,4 +104,5 @@ manajemen-kost/
    ```bash
    npm run dev
    ```
+
 ---
